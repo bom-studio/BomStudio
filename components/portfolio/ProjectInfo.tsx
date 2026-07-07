@@ -26,24 +26,46 @@ export function ProjectInfo({ project }: ProjectInfoProps) {
 
       <h2 className="text-section-title">{project.title}</h2>
 
-      <p className="mt-4 text-lg font-medium text-foreground">{project.tagline}</p>
-
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
         {project.description}
       </p>
 
-      <ul className="mt-8 space-y-2.5">
-        {project.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2.5 text-sm text-foreground/80">
-            <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-            {feature}
-          </li>
-        ))}
-      </ul>
+      <p className="mt-6 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">제작기간</span>
+        <span className="mx-2 text-border">·</span>
+        {project.duration}
+      </p>
+
+      <div className="mt-8">
+        <p className="mb-3 text-sm font-medium text-foreground">기술 스택</p>
+        <div className="flex flex-wrap gap-2">
+          {project.tech.map((tech) => (
+            <Badge
+              key={tech}
+              variant="outline"
+              className="text-xs font-normal text-muted-foreground"
+            >
+              {tech}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <p className="mb-3 text-sm font-medium text-foreground">주요 기능</p>
+        <ul className="space-y-2.5">
+          {project.features.map((feature) => (
+            <li key={feature} className="flex items-center gap-2.5 text-sm text-foreground/80">
+              <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+              {feature}
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <Button asChild size="lg" className="group/btn mt-10 w-fit">
         <a
-          href={project.deployUrl}
+          href={project.siteUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${project.title} 사이트 방문`}
@@ -52,18 +74,6 @@ export function ProjectInfo({ project }: ProjectInfoProps) {
           <ExternalLink className="transition-transform duration-300 group-hover/btn:translate-x-0.5" />
         </a>
       </Button>
-
-      <div className="mt-10 flex flex-wrap gap-2 border-t border-divider pt-8">
-        {project.tech.map((tech) => (
-          <Badge
-            key={tech}
-            variant="outline"
-            className="text-xs font-normal text-muted-foreground"
-          >
-            {tech}
-          </Badge>
-        ))}
-      </div>
     </div>
   );
 }

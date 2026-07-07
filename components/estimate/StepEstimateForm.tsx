@@ -8,6 +8,7 @@ import {
   BasicInfoStep,
   normalizeStep1Data,
 } from "@/components/estimate/BasicInfoStep";
+import { ProjectInfoStep } from "@/components/estimate/ProjectInfoStep";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -210,30 +211,16 @@ export function StepEstimateForm() {
               )}
 
               {step === 2 && (
-                <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="budget">예산</Label>
-                    <Input
-                      id="budget"
-                      placeholder="예: 39만원"
-                      value={formData.budget}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, budget: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="schedule">희망 일정</Label>
-                    <Input
-                      id="schedule"
-                      placeholder="예: 2개월 이내"
-                      value={formData.schedule}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, schedule: e.target.value }))
-                      }
-                    />
-                  </div>
-                </div>
+                <ProjectInfoStep
+                  budget={formData.budget}
+                  schedule={formData.schedule}
+                  onBudgetChange={(budget) =>
+                    setFormData((prev) => ({ ...prev, budget }))
+                  }
+                  onScheduleChange={(schedule) =>
+                    setFormData((prev) => ({ ...prev, schedule }))
+                  }
+                />
               )}
 
               {step === 3 && (

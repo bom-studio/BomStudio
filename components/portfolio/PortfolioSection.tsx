@@ -1,10 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MacbookMockup } from "@/components/portfolio/MacbookMockup";
+import { PortfolioBrowserPreview } from "@/components/portfolio/PortfolioBrowserPreview";
 import { ProjectInfo } from "@/components/portfolio/ProjectInfo";
 import type { PortfolioProject } from "@/types/portfolio";
-import { PORTFOLIO_CATEGORY_GRADIENTS } from "@/types/portfolio";
 import { cn } from "@/lib/utils";
 
 interface PortfolioSectionProps {
@@ -16,8 +15,8 @@ export function PortfolioSection({ project, index }: PortfolioSectionProps) {
   return (
     <section
       className={cn(
-        "relative overflow-hidden bg-gradient-to-b py-28 sm:py-32 lg:py-36",
-        PORTFOLIO_CATEGORY_GRADIENTS[project.category]
+        "py-28 sm:py-32 lg:py-36",
+        index % 2 === 1 && "section-alt"
       )}
       aria-labelledby={`project-${project.slug}`}
     >
@@ -40,7 +39,12 @@ export function PortfolioSection({ project, index }: PortfolioSectionProps) {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, delay: 0.08 + index * 0.08, ease: [0.22, 1, 0.36, 1] }}
           >
-            <MacbookMockup project={project} priority={index === 0} />
+            <PortfolioBrowserPreview
+              previewImage={project.previewImage}
+              siteUrl={project.siteUrl}
+              title={project.title}
+              priority={index === 0}
+            />
           </motion.div>
         </div>
       </div>

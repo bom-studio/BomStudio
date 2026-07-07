@@ -147,6 +147,47 @@ h6 {
   @apply -translate-y-1 shadow-xl;
 }
 
+.hero-surface {
+  background: #fcfcfc;
+}
+
+.dark .hero-surface {
+  background: var(--background);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 100% 90% at 55% 10%, black 25%, transparent 95%);
+}
+
+.hero-dots {
+  background-image: radial-gradient(rgba(15, 118, 110, 0.28) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+/* 브라우저 내부 롱 스크린샷을 위아래로 천천히 왕복 스크롤 */
+@keyframes hero-autoscroll {
+  0%,
+  6% {
+    transform: translateY(0);
+  }
+  50%,
+  56% {
+    transform: translateY(calc(-100% + var(--hero-viewport, 420px)));
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.hero-autoscroll {
+  animation: hero-autoscroll 14s ease-in-out infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -1,23 +1,17 @@
-import { PageHero } from "@/components/layout/PageHero";
+import { PageHeroSection } from "@/components/layout/PageHeroSection";
 import { ProcessContent } from "@/components/sections/ProcessContent";
-import { PAGE_META } from "@/constants/page-meta";
+import { PAGE_META, getPageSeoTitle } from "@/constants/page-meta";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata(
-  PAGE_META.process.label,
+  getPageSeoTitle(PAGE_META.process),
   PAGE_META.process.description
 );
 
 export default function ProcessPage() {
-  const meta = PAGE_META.process;
-
   return (
     <>
-      <PageHero
-        label={meta.label}
-        title={meta.title}
-        description={meta.description}
-      />
+      <PageHeroSection variant="process" />
       <ProcessContent showHeader={false} />
     </>
   );

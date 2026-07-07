@@ -1,23 +1,17 @@
-import { PageHero } from "@/components/layout/PageHero";
+import { PageHeroSection } from "@/components/layout/PageHeroSection";
 import { StepEstimateForm } from "@/components/estimate/StepEstimateForm";
-import { PAGE_META } from "@/constants/page-meta";
+import { PAGE_META, getPageSeoTitle } from "@/constants/page-meta";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata(
-  PAGE_META.estimate.label,
+  getPageSeoTitle(PAGE_META.estimate),
   PAGE_META.estimate.description
 );
 
 export default function EstimatePage() {
-  const meta = PAGE_META.estimate;
-
   return (
     <>
-      <PageHero
-        label={meta.label}
-        title={meta.title}
-        description={meta.description}
-      />
+      <PageHeroSection variant="estimate" />
       <section className="section-padding">
         <div className="container-max">
           <StepEstimateForm />

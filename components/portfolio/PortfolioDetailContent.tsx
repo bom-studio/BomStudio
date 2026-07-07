@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Check, ExternalLink } from "lucide-react";
 import { GithubIcon } from "@/components/icons/GithubIcon";
-import { MacbookMockup } from "@/components/portfolio/MacbookMockup";
+import { PortfolioBrowserPreview } from "@/components/portfolio/PortfolioBrowserPreview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PortfolioProject } from "@/types/portfolio";
@@ -17,8 +17,9 @@ interface PortfolioDetailContentProps {
 export function PortfolioDetailContent({ project }: PortfolioDetailContentProps) {
   return (
     <>
-      <section className="gradient-hero border-b border-border pt-24 pb-12 sm:pt-28">
-        <div className="container-max px-8">
+      <section className="hero-surface relative overflow-hidden border-b border-border pt-24 pb-12 sm:pt-28">
+        <div className="hero-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="container-max relative px-8">
           <Badge
             variant="outline"
             className={cn("mb-4 border-0", PORTFOLIO_CATEGORY_BADGE[project.category])}
@@ -35,12 +36,23 @@ export function PortfolioDetailContent({ project }: PortfolioDetailContentProps)
       <section className="section-padding">
         <div className="container-max px-8">
           <div className="mb-12">
-            <MacbookMockup project={project} priority />
+            <PortfolioBrowserPreview
+              previewImage={project.previewImage}
+              siteUrl={project.siteUrl}
+              title={project.title}
+              priority
+            />
           </div>
 
           <div className="mx-auto max-w-3xl space-y-8">
             <p className="text-base leading-relaxed text-muted-foreground">
               {project.description}
+            </p>
+
+            <p className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">제작기간</span>
+              <span className="mx-2 text-border">·</span>
+              {project.duration}
             </p>
 
             <div>
@@ -69,7 +81,7 @@ export function PortfolioDetailContent({ project }: PortfolioDetailContentProps)
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <a
-                  href={project.deployUrl}
+                  href={project.siteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${project.title} 사이트 방문`}

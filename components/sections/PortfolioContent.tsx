@@ -23,8 +23,8 @@ export function PortfolioContent({
           <div className="container-max">
             <SectionHeader
               label="Portfolio"
-              title="직접 제작한 프로젝트"
-              description="실제 운영 중인 웹사이트를 하나씩 살펴보세요"
+              title="결과로 증명하는 웹사이트."
+              description="기획부터 디자인, 개발, 배포까지. 브랜드의 가치를 담은 웹사이트를 직접 설계하고 제작합니다."
             />
           </div>
         </AnimatedSection>
