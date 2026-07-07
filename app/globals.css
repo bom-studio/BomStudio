@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --primary: #0f766e;
+  --primary-hover: #115e59;
+  --primary-foreground: #ffffff;
+  --secondary: #134e4a;
+  --accent: #2dd4bf;
+  --accent-foreground: #134e4a;
+  --muted: #fafafa;
+  --muted-foreground: #6b7280;
+  --body: #374151;
+  --border: #e5e7eb;
+  --divider: #f1f5f9;
+  --section: #fafafa;
+  --ring: #0f766e;
+  --radius: 0.875rem;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #171717;
+  --card-foreground: #fafafa;
+  --primary: #14b8a6;
+  --primary-hover: #0d9488;
+  --primary-foreground: #ffffff;
+  --secondary: #134e4a;
+  --accent: #2dd4bf;
+  --accent-foreground: #134e4a;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --body: #d1d5db;
+  --border: #262626;
+  --divider: #1f2937;
+  --section: #111111;
+  --ring: #14b8a6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-section: var(--section);
+  --color-divider: var(--divider);
+  --font-sans: "Pretendard", system-ui, sans-serif;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--body);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--foreground);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--foreground);
+}
+
+.gradient-hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.dark .gradient-hero {
+  background: linear-gradient(180deg, var(--background) 0%, #111111 100%);
+}
+
+.section-padding {
+  @apply px-8 py-28 lg:py-36;
+}
+
+.section-alt {
+  background: var(--section);
+}
+
+.container-max {
+  @apply mx-auto w-full max-w-[1280px];
+}
+
+.text-hero {
+  @apply text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl lg:text-[64px];
+}
+
+.text-section-title {
+  @apply text-3xl font-bold leading-tight tracking-tight sm:text-[40px];
+}
+
+.text-card-title {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+.text-body-lg {
+  @apply text-lg leading-relaxed;
+}
+
+.text-label {
+  @apply text-sm font-medium tracking-widest text-muted-foreground uppercase;
+}
+
+.premium-card {
+  @apply rounded-2xl border border-border bg-card shadow-sm transition-all duration-300;
+}
+
+.premium-card:hover {
+  @apply -translate-y-1 shadow-xl;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.3s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.3s ease-out;
+}
