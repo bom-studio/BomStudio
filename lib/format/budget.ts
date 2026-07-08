@@ -17,3 +17,16 @@ export function formatBudget(value: string): string {
 export function getBudgetDigits(value: string): string {
   return extractBudgetDigits(value);
 }
+
+export function formatBudgetCurrency(value: string | null | undefined): string {
+  if (!value?.trim()) {
+    return "-";
+  }
+
+  const digits = extractBudgetDigits(value);
+  if (!digits) {
+    return value.trim();
+  }
+
+  return `₩${Number(digits).toLocaleString("ko-KR")}`;
+}

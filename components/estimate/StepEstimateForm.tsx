@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Send, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { submitEstimateInquiry } from "@/app/actions/inquiries";
@@ -19,6 +19,7 @@ import { transition } from "@/lib/motion";
 import {
   hasStep1Errors,
   hasStep3Errors,
+  validateReferenceUrls,
   validateStep1,
   validateStep1Field,
   validateStep3,
@@ -34,11 +35,13 @@ import {
 } from "@/types/estimate";
 import { cn } from "@/lib/utils";
 
+const TOTAL_STEPS = 4;
+
 const STEPS = [
   { id: 1, title: "기본 정보", description: "연락처를 입력해 주세요" },
   { id: 2, title: "프로젝트 정보", description: "예산과 일정을 알려주세요" },
   { id: 3, title: "요구사항", description: "필요한 페이지와 기능을 선택해 주세요" },
-  { id: 4, title: "추가 정보", description: "참고 자료와 요청사항을 입력해 주세요" },
+  { id: 4, title: "추가 정보", description: "참고 사이트와 문의 내용을 입력해 주세요" },
 ];
 
 const INITIAL_FORM_DATA: EstimateFormData = {
@@ -46,6 +49,7 @@ const INITIAL_FORM_DATA: EstimateFormData = {
   contact: "",
   phone: "",
   email: "",
+  businessType: "",
   budget: "",
   schedule: "",
   pages: [],
@@ -59,10 +63,14 @@ const ALL_STEP1_TOUCHED: EstimateStep1Touched = {
   contact: true,
   phone: true,
   email: true,
+  businessType: true,
+  businessTypeOther: true,
 };
 
+const EMPTY_REFERENCE_URLS = ["", "", ""];
+
 export function StepEstimateForm() {
-  const [step, setStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -71,21 +79,46 @@ export function StepEstimateForm() {
   const [step1Errors, setStep1Errors] = useState<EstimateStep1Errors>({});
   const [step1Touched, setStep1Touched] = useState<EstimateStep1Touched>({});
   const [step3Errors, setStep3Errors] = useState<EstimateStep3Errors>({});
+  const [referenceUrls, setReferenceUrls] = useState<string[]>([...EMPTY_REFERENCE_URLS]);
+  const [referenceErrors, setReferenceErrors] = useState<(string | undefined)[]>([
+    undefined,
+    undefined,
+    undefined,
+  ]);
 
   const handleStep1Change = (field: EstimateStep1Field, value: string) => {
-    setStep1Data((prev) => ({ ...prev, [field]: value }));
-    setStep1Touched((prev) => ({ ...prev, [field]: true }));
-    setStep1Errors((prev) => ({
-      ...prev,
-      [field]: validateStep1Field(field, value),
-    }));
+    setStep1Data((prev) => {
+      const nextData = { ...prev, [field]: value };
+
+      if (field === "businessType" && value !== "기타") {
+        nextData.businessTypeOther = "";
+      }
+
+      setStep1Touched((prevTouched) => ({
+        ...prevTouched,
+        [field]: true,
+        ...(field === "businessType" && value !== "기타"
+          ? { businessTypeOther: false }
+          : {}),
+      }));
+
+      setStep1Errors((prevErrors) => ({
+        ...prevErrors,
+        [field]: validateStep1Field(field, value, nextData),
+        ...(field === "businessType" && value !== "기타"
+          ? { businessTypeOther: undefined }
+          : {}),
+      }));
+
+      return nextData;
+    });
   };
 
   const handleStep1Blur = (field: EstimateStep1Field) => {
     setStep1Touched((prev) => ({ ...prev, [field]: true }));
     setStep1Errors((prev) => ({
       ...prev,
-      [field]: validateStep1Field(field, step1Data[field]),
+      [field]: validateStep1Field(field, step1Data[field], step1Data),
     }));
   };
 
@@ -107,6 +140,10 @@ export function StepEstimateForm() {
       contact: normalized.contact,
       phone: normalized.phone,
       email: normalized.email,
+      businessType:
+        normalized.businessType === "기타"
+          ? `기타: ${normalized.businessTypeOther}`
+          : normalized.businessType,
     }));
 
     return normalized;
@@ -118,18 +155,46 @@ export function StepEstimateForm() {
     return !hasStep3Errors(errors);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateStep4Reference = () => {
+    const joined = referenceUrls.map((url) => url.trim()).filter(Boolean).join("\n");
+    const error = validateReferenceUrls(joined);
+
+    if (!error) {
+      setReferenceErrors([undefined, undefined, undefined]);
+      setFormData((prev) => ({ ...prev, reference: joined }));
+      return true;
+    }
+
+    setReferenceErrors(
+      referenceUrls.map((url) =>
+        url.trim() && !/^https?:\/\//.test(url.trim())
+          ? "http:// 또는 https:// 로 시작해야 합니다."
+          : undefined
+      )
+    );
+    return false;
+  };
+
+  const submitFromStep4 = () => {
     setSubmitError(null);
+
+    if (currentStep !== TOTAL_STEPS) {
+      return;
+    }
 
     const normalized = validateAndNormalizeStep1();
     if (!normalized) {
-      setStep(1);
+      setCurrentStep(1);
       return;
     }
 
     if (!validateRequirements()) {
-      setStep(3);
+      setCurrentStep(3);
+      return;
+    }
+
+    if (!validateStep4Reference()) {
+      setCurrentStep(4);
       return;
     }
 
@@ -139,6 +204,10 @@ export function StepEstimateForm() {
       contact: normalized.contact,
       phone: normalized.phone,
       email: normalized.email,
+      businessType:
+        normalized.businessType === "기타"
+          ? `기타: ${normalized.businessTypeOther}`
+          : normalized.businessType,
     };
 
     startTransition(async () => {
@@ -154,24 +223,34 @@ export function StepEstimateForm() {
       setStep1Errors({});
       setStep1Touched({});
       setStep3Errors({});
-      setStep(1);
+      setReferenceUrls([...EMPTY_REFERENCE_URLS]);
+      setReferenceErrors([undefined, undefined, undefined]);
+      setCurrentStep(1);
     });
   };
 
   const nextStep = () => {
-    if (step === 1) {
+    if (currentStep === 1) {
       const result = validateAndNormalizeStep1();
       if (!result) return;
-    }
-
-    if (step === 3 && !validateRequirements()) {
+      setCurrentStep(2);
       return;
     }
 
-    setStep((s) => Math.min(s + 1, 4));
+    if (currentStep === 2) {
+      setCurrentStep(3);
+      return;
+    }
+
+    if (currentStep === 3) {
+      if (!validateRequirements()) {
+        return;
+      }
+      setCurrentStep(4);
+    }
   };
 
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+  const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
 
   if (submitted) {
     return (
@@ -206,12 +285,12 @@ export function StepEstimateForm() {
                 <div
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors",
-                    step >= s.id
+                    currentStep >= s.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   )}
                 >
-                  {step > s.id ? <Check className="h-4 w-4" /> : s.id}
+                  {currentStep > s.id ? <Check className="h-4 w-4" /> : s.id}
                 </div>
                 <span className="mt-2 hidden text-xs text-muted-foreground sm:block">
                   {s.title}
@@ -221,7 +300,7 @@ export function StepEstimateForm() {
                 <div
                   className={cn(
                     "mx-2 h-px flex-1 transition-colors",
-                    step > s.id ? "bg-primary" : "bg-border"
+                    currentStep > s.id ? "bg-primary" : "bg-border"
                   )}
                 />
               )}
@@ -230,22 +309,29 @@ export function StepEstimateForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} noValidate>
+      <form
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+          }
+        }}
+        noValidate
+      >
         <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm sm:p-10">
           <AnimatePresence mode="wait">
             <motion.div
-              key={step}
+              key={currentStep}
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
               transition={transition.normal}
             >
-              <h2 className="text-xl font-semibold">{STEPS[step - 1].title}</h2>
+              <h2 className="text-xl font-semibold">{STEPS[currentStep - 1].title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {STEPS[step - 1].description}
+                {STEPS[currentStep - 1].description}
               </p>
 
-              {step === 1 && (
+              {currentStep === 1 && (
                 <BasicInfoStep
                   data={step1Data}
                   errors={step1Errors}
@@ -255,7 +341,7 @@ export function StepEstimateForm() {
                 />
               )}
 
-              {step === 2 && (
+              {currentStep === 2 && (
                 <ProjectInfoStep
                   budget={formData.budget}
                   schedule={formData.schedule}
@@ -268,7 +354,7 @@ export function StepEstimateForm() {
                 />
               )}
 
-              {step === 3 && (
+              {currentStep === 3 && (
                 <RequirementsStep
                   pages={formData.pages}
                   features={formData.features}
@@ -288,35 +374,66 @@ export function StepEstimateForm() {
                 />
               )}
 
-              {step === 4 && (
+              {currentStep === 4 && (
                 <div className="mt-8 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="reference">참고 사이트</Label>
-                    <Input
-                      id="reference"
-                      placeholder="https://example.com"
-                      value={formData.reference}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, reference: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="file">파일 첨부</Label>
-                    <div className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <Input
-                        id="file"
-                        type="file"
-                        className="border-0 p-0 file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground"
-                      />
+                    <Label>참고 사이트 URL</Label>
+                    <p className="text-sm text-muted-foreground">
+                      비슷하게 만들고 싶은 사이트가 있다면 최대 3개까지 입력해주세요.
+                    </p>
+                    <div className="space-y-3">
+                      {referenceUrls.map((url, index) => (
+                        <div key={`reference-${index}`} className="space-y-1">
+                          <Label htmlFor={`reference-${index + 1}`} className="text-xs text-muted-foreground">
+                            참고 사이트 URL {index + 1}
+                          </Label>
+                          <Input
+                            id={`reference-${index + 1}`}
+                            placeholder="https://example.com"
+                            value={url}
+                            onChange={(e) => {
+                              const next = [...referenceUrls];
+                              next[index] = e.target.value;
+                              setReferenceUrls(next);
+
+                              const nextJoined = next
+                                .map((item) => item.trim())
+                                .filter(Boolean)
+                                .join("\n");
+                              setFormData((prev) => ({ ...prev, reference: nextJoined }));
+
+                              setReferenceErrors((prev) => {
+                                const nextErrors = [...prev];
+                                if (!e.target.value.trim() || /^https?:\/\//.test(e.target.value.trim())) {
+                                  nextErrors[index] = undefined;
+                                }
+                                return nextErrors;
+                              });
+                            }}
+                            onBlur={() => {
+                              const trimmed = referenceUrls[index].trim();
+                              setReferenceErrors((prev) => {
+                                const nextErrors = [...prev];
+                                nextErrors[index] =
+                                  trimmed && !/^https?:\/\//.test(trimmed)
+                                    ? "http:// 또는 https:// 로 시작해야 합니다."
+                                    : undefined;
+                                return nextErrors;
+                              });
+                            }}
+                          />
+                          {referenceErrors[index] ? (
+                            <p className="text-xs text-destructive">{referenceErrors[index]}</p>
+                          ) : null}
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="notes">추가 요청사항</Label>
+                    <Label htmlFor="notes">문의 내용</Label>
                     <Textarea
                       id="notes"
-                      placeholder="추가로 전달하고 싶은 내용을 자유롭게 작성해 주세요"
+                      placeholder="프로젝트 목적, 원하는 방향, 추가 요청사항을 자유롭게 작성해 주세요"
                       value={formData.notes}
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, notes: e.target.value }))
@@ -336,7 +453,7 @@ export function StepEstimateForm() {
             ) : null}
 
             <div className="flex items-center justify-between gap-4">
-            {step > 1 ? (
+            {currentStep > 1 ? (
               <Button type="button" variant="outline" onClick={prevStep} className="group">
                 <ArrowLeft className="transition-transform group-hover:-translate-x-0.5" />
                 이전
@@ -345,14 +462,19 @@ export function StepEstimateForm() {
               <div />
             )}
 
-            {step < 4 ? (
+            {currentStep < TOTAL_STEPS ? (
               <Button type="button" onClick={nextStep} className="group">
                 다음
                 <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
               </Button>
             ) : (
-              <Button type="submit" className="group" disabled={isPending}>
-                {isPending ? "제출 중..." : "견적 문의 제출"}
+              <Button
+                type="button"
+                className="group"
+                disabled={isPending}
+                onClick={submitFromStep4}
+              >
+                {isPending ? "제출 중..." : "제출하기"}
                 <Send className="transition-transform group-hover:translate-x-0.5" />
               </Button>
             )}

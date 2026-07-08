@@ -1,10 +1,18 @@
-export type EstimateStep1Field = "company" | "contact" | "phone" | "email";
+export type EstimateStep1Field =
+  | "company"
+  | "contact"
+  | "phone"
+  | "email"
+  | "businessType"
+  | "businessTypeOther";
 
 export interface EstimateStep1Data {
   company: string;
   contact: string;
   phone: string;
   email: string;
+  businessType: string;
+  businessTypeOther: string;
 }
 
 export type EstimateStep1Errors = Partial<Record<EstimateStep1Field, string>>;
@@ -16,6 +24,8 @@ export const INITIAL_STEP1_DATA: EstimateStep1Data = {
   contact: "",
   phone: "",
   email: "",
+  businessType: "",
+  businessTypeOther: "",
 };
 
 export interface EstimateStep3Errors {

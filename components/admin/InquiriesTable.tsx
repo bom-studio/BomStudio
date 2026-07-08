@@ -5,6 +5,8 @@ import { INQUIRY_STATUSES } from "@/constants/inquiry";
 import type { EstimateInquiry } from "@/types/inquiry";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Input } from "@/components/ui/input";
+import { getInquiryDisplayNumber } from "@/lib/admin/inquiry-number";
+import { formatBudgetCurrency } from "@/lib/format/budget";
 import { cn } from "@/lib/utils";
 
 interface InquiriesTableProps {
@@ -85,6 +87,7 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
         <table className="w-full text-left text-sm">
           <thead className="border-b border-border bg-section/60 text-muted-foreground">
             <tr>
+              <th className="px-5 py-3 font-medium">문의번호</th>
               <th className="px-5 py-3 font-medium">접수일</th>
               <th className="px-5 py-3 font-medium">이름</th>
               <th className="px-5 py-3 font-medium">연락처</th>
@@ -97,11 +100,14 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
           <tbody>
             {inquiries.map((inquiry) => (
               <tr key={inquiry.id} className="border-b border-border/70 last:border-0">
+                <td className="px-5 py-4 font-mono text-xs text-muted-foreground">
+                  {getInquiryDisplayNumber(inquiry)}
+                </td>
                 <td className="px-5 py-4 text-muted-foreground">{formatDate(inquiry.created_at)}</td>
                 <td className="px-5 py-4 font-medium">{inquiry.name}</td>
                 <td className="px-5 py-4">{inquiry.phone}</td>
                 <td className="px-5 py-4">{inquiry.business_type || inquiry.company || "-"}</td>
-                <td className="px-5 py-4">{inquiry.budget || "-"}</td>
+                <td className="px-5 py-4">{formatBudgetCurrency(inquiry.budget)}</td>
                 <td className="px-5 py-4">
                   <StatusBadge status={inquiry.status} />
                 </td>
@@ -134,8 +140,8 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
               <StatusBadge status={inquiry.status} />
             </div>
             <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-              <span>{formatDate(inquiry.created_at)}</span>
-              <span>{inquiry.budget || "-"}</span>
+              <span>{getInquiryDisplayNumber(inquiry)}</span>
+              <span>{formatBudgetCurrency(inquiry.budget)}</span>
             </div>
           </Link>
         ))}

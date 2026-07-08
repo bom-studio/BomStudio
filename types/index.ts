@@ -48,6 +48,7 @@ export interface EstimateFormData {
   contact: string;
   phone: string;
   email: string;
+  businessType: string;
   budget: string;
   schedule: string;
   pages: string[];

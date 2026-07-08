@@ -6,12 +6,16 @@ import type {
   EstimateStep1Field,
   EstimateStep1Touched,
 } from "@/types/estimate";
+import { BUSINESS_TYPE_OPTIONS } from "@/constants/business-type";
 import { FormField } from "@/components/estimate/FormField";
+import { Label } from "@/components/ui/label";
 import { formatPhoneNumber } from "@/lib/format/phone";
 import {
+  sanitizeBusinessTypeOtherInput,
   sanitizeCompanyInput,
   sanitizeContactNameInput,
 } from "@/lib/validation/estimate";
+import { cn } from "@/lib/utils";
 
 interface BasicInfoStepProps {
   data: EstimateStep1Data;
@@ -45,6 +49,14 @@ export function BasicInfoStep({
 
   const handleEmailChange = (value: string) => {
     onChange("email", value);
+  };
+
+  const handleBusinessTypeChange = (value: string) => {
+    onChange("businessType", value);
+  };
+
+  const handleBusinessTypeOtherChange = (value: string) => {
+    onChange("businessTypeOther", sanitizeBusinessTypeOtherInput(value));
   };
 
   return (
@@ -90,6 +102,50 @@ export function BasicInfoStep({
         maxLength={13}
       />
 
+      <div className="sm:col-span-2 space-y-2">
+        <Label htmlFor="businessType">업종</Label>
+        <select
+          id="businessType"
+          value={data.businessType}
+          onChange={(e) => handleBusinessTypeChange(e.target.value)}
+          onBlur={() => onBlur("businessType")}
+          aria-invalid={Boolean(showError("businessType"))}
+          aria-describedby={showError("businessType") ? "businessType-error" : undefined}
+          className={cn(
+            "flex h-11 w-full rounded-xl border border-border bg-background px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            showError("businessType") && "border-destructive focus-visible:ring-destructive"
+          )}
+        >
+          <option value="">업종을 선택해주세요</option>
+          {BUSINESS_TYPE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {showError("businessType") ? (
+          <p id="businessType-error" className="text-xs text-destructive" role="alert">
+            {showError("businessType")}
+          </p>
+        ) : null}
+      </div>
+
+      {data.businessType === "기타" ? (
+        <div className="sm:col-span-2">
+          <FormField
+            id="businessTypeOther"
+            label="기타 업종"
+            placeholder="예: 제조업, IT 서비스"
+            value={data.businessTypeOther}
+            onChange={(e) => handleBusinessTypeOtherChange(e.target.value)}
+            onBlur={() => onBlur("businessTypeOther")}
+            error={showError("businessTypeOther")}
+            errorId="businessTypeOther-error"
+            maxLength={50}
+          />
+        </div>
+      ) : null}
+
       <div className="sm:col-span-2">
         <FormField
           id="email"
@@ -114,5 +170,7 @@ export function normalizeStep1Data(data: EstimateStep1Data): EstimateStep1Data {
     contact: data.contact.trim(),
     phone: data.phone.trim(),
     email: data.email.trim(),
+    businessType: data.businessType.trim(),
+    businessTypeOther: data.businessTypeOther.trim(),
   };
 }

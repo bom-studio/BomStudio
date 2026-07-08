@@ -12,6 +12,7 @@ import {
   validateContactName,
   validateEmail,
   validatePhone,
+  validateReferenceUrls,
   validateStep3,
   hasStep3Errors,
 } from "@/lib/validation/estimate";
@@ -26,7 +27,7 @@ function mapFormToInsert(data: EstimateFormData): EstimateInquiryInsert {
     phone: data.phone.trim(),
     email: data.email.trim() || null,
     company: data.company.trim() || null,
-    business_type: null,
+    business_type: data.businessType.trim() || null,
     budget: data.budget.trim() || null,
     schedule: data.schedule.trim() || null,
     pages: data.pages,
@@ -47,6 +48,9 @@ function validateInquiryPayload(data: EstimateFormData): string | null {
     const emailError = validateEmail(data.email);
     if (emailError) return emailError;
   }
+
+  const referenceError = validateReferenceUrls(data.reference);
+  if (referenceError) return referenceError;
 
   const step3Errors = validateStep3(data.pages, data.features);
   if (hasStep3Errors(step3Errors)) {
@@ -103,6 +107,66 @@ export async function updateInquiryStatus(
   revalidatePath("/admin/inquiries");
   revalidatePath(`/admin/inquiries/${id}`);
   return { success: true };
+}
+
+export async function updateInquiryAdminNote(
+  id: string,
+  adminNote: string
+): Promise<InquiryActionResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("estimate_inquiries")
+    .update({ admin_note: adminNote.trim() || null })
+    .eq("id", id);
+
+  if (error) {
+    return { success: false, error: "메모 저장 중 오류가 발생했습니다." };
+  }
+
+  revalidatePath(`/admin/inquiries/${id}`);
+  return { success: true };
+}
+
+export async function deleteInquiry(id: string): Promise<InquiryActionResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("estimate_inquiries").delete().eq("id", id);
+
+  if (error) {
+    return { success: false, error: "문의 삭제 중 오류가 발생했습니다." };
+  }
+
+  revalidatePath("/admin/inquiries");
+  redirect("/admin/inquiries");
+}
+
+export async function createEstimateFromInquiry(
+  inquiryId: string
+): Promise<InquiryActionResult & { estimateId?: string }> {
+  await requireAdmin();
+
+  const estimateId = crypto.randomUUID();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("estimate_inquiries")
+    .update({
+      estimate_id: estimateId,
+      estimate_created_at: new Date().toISOString(),
+      status: "견적서작성",
+    })
+    .eq("id", inquiryId);
+
+  if (error) {
+    return { success: false, error: "견적서 저장 중 오류가 발생했습니다." };
+  }
+
+  revalidatePath("/admin/inquiries");
+  revalidatePath(`/admin/inquiries/${inquiryId}`);
+  return { success: true, estimateId };
 }
 
 export async function loginAdmin(
