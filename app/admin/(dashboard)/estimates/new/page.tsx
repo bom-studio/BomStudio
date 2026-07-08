@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { EstimateDraftForm } from "@/components/admin/EstimateDraftForm";
+import { EstimateBuilderForm } from "@/components/admin/EstimateBuilderForm";
 import { fetchInquiryById } from "@/lib/admin/inquiries";
 
 export const metadata = {
@@ -22,5 +22,5 @@ export default async function NewEstimatePage({ searchParams }: NewEstimatePageP
     notFound();
   }
 
-  return <EstimateDraftForm inquiry={inquiry} />;
+  return <EstimateBuilderForm inquiry={inquiry} />;
 }
