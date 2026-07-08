@@ -7,7 +7,10 @@ import { PortfolioBrowserPreview } from "@/components/portfolio/PortfolioBrowser
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PortfolioProject } from "@/types/portfolio";
-import { PORTFOLIO_CATEGORY_BADGE } from "@/types/portfolio";
+import {
+  getPortfolioCategoryLabel,
+  PORTFOLIO_CATEGORY_BADGE,
+} from "@/types/portfolio";
 import { cn } from "@/lib/utils";
 
 interface PortfolioDetailContentProps {
@@ -24,8 +27,13 @@ export function PortfolioDetailContent({ project }: PortfolioDetailContentProps)
             variant="outline"
             className={cn("mb-4 border-0", PORTFOLIO_CATEGORY_BADGE[project.category])}
           >
-            {project.category}
+            {getPortfolioCategoryLabel(project.category)}
           </Badge>
+          {project.status ? (
+            <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              {project.status}
+            </p>
+          ) : null}
           <h1 className="text-section-title">{project.title}</h1>
           <p className="mt-4 max-w-2xl text-body-lg text-muted-foreground">
             {project.tagline}
@@ -90,17 +98,19 @@ export function PortfolioDetailContent({ project }: PortfolioDetailContentProps)
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
-              <Button asChild variant="secondary" size="lg">
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${project.title} GitHub 저장소`}
-                >
-                  GitHub
-                  <GithubIcon />
-                </a>
-              </Button>
+              {project.githubUrl ? (
+                <Button asChild variant="secondary" size="lg">
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${project.title} GitHub 저장소`}
+                  >
+                    GitHub
+                    <GithubIcon />
+                  </a>
+                </Button>
+              ) : null}
               <Button asChild variant="ghost" size="lg" className="sm:ml-auto">
                 <Link href="/portfolio">
                   <ArrowLeft className="h-4 w-4" />

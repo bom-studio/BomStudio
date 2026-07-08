@@ -3,6 +3,7 @@
 Place full-page homepage captures here (WebP recommended):
 
 - `aone-long.webp` — A-One 수학학원
+- `arsene-long.webp` — Arsene Long (요양병원)
 - `mukhyang-long.webp` — 묵향인쇄
 - `sajangman-long.webp` — 사장만
 

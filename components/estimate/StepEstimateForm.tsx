@@ -3,23 +3,25 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Send, Upload } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { submitEstimateInquiry } from "@/app/actions/inquiries";
 import {
   BasicInfoStep,
   normalizeStep1Data,
 } from "@/components/estimate/BasicInfoStep";
 import { ProjectInfoStep } from "@/components/estimate/ProjectInfoStep";
+import { RequirementsStep } from "@/components/estimate/RequirementsStep";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FEATURE_OPTIONS, PAGE_OPTIONS } from "@/constants/contact";
 import { transition } from "@/lib/motion";
 import {
   hasStep1Errors,
+  hasStep3Errors,
   validateStep1,
   validateStep1Field,
+  validateStep3,
 } from "@/lib/validation/estimate";
 import type { EstimateFormData } from "@/types";
 import {
@@ -28,6 +30,7 @@ import {
   type EstimateStep1Errors,
   type EstimateStep1Field,
   type EstimateStep1Touched,
+  type EstimateStep3Errors,
 } from "@/types/estimate";
 import { cn } from "@/lib/utils";
 
@@ -61,18 +64,13 @@ const ALL_STEP1_TOUCHED: EstimateStep1Touched = {
 export function StepEstimateForm() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState<EstimateFormData>(INITIAL_FORM_DATA);
   const [step1Data, setStep1Data] = useState<EstimateStep1Data>(INITIAL_STEP1_DATA);
   const [step1Errors, setStep1Errors] = useState<EstimateStep1Errors>({});
   const [step1Touched, setStep1Touched] = useState<EstimateStep1Touched>({});
-
-  const toggleItem = (
-    item: string,
-    list: string[],
-    setter: (v: string[]) => void
-  ) => {
-    setter(list.includes(item) ? list.filter((i) => i !== item) : [...list, item]);
-  };
+  const [step3Errors, setStep3Errors] = useState<EstimateStep3Errors>({});
 
   const handleStep1Change = (field: EstimateStep1Field, value: string) => {
     setStep1Data((prev) => ({ ...prev, [field]: value }));
@@ -114,15 +112,60 @@ export function StepEstimateForm() {
     return normalized;
   };
 
+  const validateRequirements = (): boolean => {
+    const errors = validateStep3(formData.pages, formData.features);
+    setStep3Errors(errors);
+    return !hasStep3Errors(errors);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitError(null);
+
+    const normalized = validateAndNormalizeStep1();
+    if (!normalized) {
+      setStep(1);
+      return;
+    }
+
+    if (!validateRequirements()) {
+      setStep(3);
+      return;
+    }
+
+    const payload: EstimateFormData = {
+      ...formData,
+      company: normalized.company,
+      contact: normalized.contact,
+      phone: normalized.phone,
+      email: normalized.email,
+    };
+
+    startTransition(async () => {
+      const result = await submitEstimateInquiry(payload);
+      if (!result.success) {
+        setSubmitError(result.error);
+        return;
+      }
+
+      setSubmitted(true);
+      setFormData(INITIAL_FORM_DATA);
+      setStep1Data(INITIAL_STEP1_DATA);
+      setStep1Errors({});
+      setStep1Touched({});
+      setStep3Errors({});
+      setStep(1);
+    });
   };
 
   const nextStep = () => {
     if (step === 1) {
       const result = validateAndNormalizeStep1();
       if (!result) return;
+    }
+
+    if (step === 3 && !validateRequirements()) {
+      return;
     }
 
     setStep((s) => Math.min(s + 1, 4));
@@ -142,7 +185,9 @@ export function StepEstimateForm() {
         </div>
         <h2 className="text-2xl font-bold">접수 완료</h2>
         <p className="mt-3 text-muted-foreground">
-          견적 문의가 접수되었습니다. 영업일 기준 1~2일 내에 연락드리겠습니다.
+          견적문의가 정상적으로 접수되었습니다.
+          <br />
+          영업일 기준 1~2일 내에 연락드리겠습니다.
         </p>
         <Button asChild className="mt-8">
           <Link href="/">홈으로 돌아가기</Link>
@@ -224,50 +269,23 @@ export function StepEstimateForm() {
               )}
 
               {step === 3 && (
-                <div className="mt-8 space-y-8">
-                  <div className="space-y-3">
-                    <Label>필요한 페이지</Label>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {PAGE_OPTIONS.map((page) => (
-                        <label
-                          key={page}
-                          className="flex cursor-pointer items-center gap-2 rounded-xl border border-border/60 p-3 text-sm transition-colors hover:bg-muted/50"
-                        >
-                          <Checkbox
-                            checked={formData.pages.includes(page)}
-                            onCheckedChange={() =>
-                              toggleItem(page, formData.pages, (pages) =>
-                                setFormData((prev) => ({ ...prev, pages }))
-                              )
-                            }
-                          />
-                          {page}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <Label>필요한 기능</Label>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                      {FEATURE_OPTIONS.map((feature) => (
-                        <label
-                          key={feature}
-                          className="flex cursor-pointer items-center gap-2 rounded-xl border border-border/60 p-3 text-sm transition-colors hover:bg-muted/50"
-                        >
-                          <Checkbox
-                            checked={formData.features.includes(feature)}
-                            onCheckedChange={() =>
-                              toggleItem(feature, formData.features, (features) =>
-                                setFormData((prev) => ({ ...prev, features }))
-                              )
-                            }
-                          />
-                          {feature}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <RequirementsStep
+                  pages={formData.pages}
+                  features={formData.features}
+                  errors={step3Errors}
+                  onPagesChange={(pages) => {
+                    setFormData((prev) => ({ ...prev, pages }));
+                    if (pages.length > 0) {
+                      setStep3Errors((prev) => ({ ...prev, pages: undefined }));
+                    }
+                  }}
+                  onFeaturesChange={(features) => {
+                    setFormData((prev) => ({ ...prev, features }));
+                    if (features.length > 0) {
+                      setStep3Errors((prev) => ({ ...prev, features: undefined }));
+                    }
+                  }}
+                />
               )}
 
               {step === 4 && (
@@ -310,7 +328,14 @@ export function StepEstimateForm() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-10 flex items-center justify-between gap-4">
+          <div className="relative mt-10 space-y-4">
+            {submitError ? (
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {submitError}
+              </p>
+            ) : null}
+
+            <div className="flex items-center justify-between gap-4">
             {step > 1 ? (
               <Button type="button" variant="outline" onClick={prevStep} className="group">
                 <ArrowLeft className="transition-transform group-hover:-translate-x-0.5" />
@@ -326,11 +351,12 @@ export function StepEstimateForm() {
                 <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
               </Button>
             ) : (
-              <Button type="submit" className="group">
-                견적 문의 제출
+              <Button type="submit" className="group" disabled={isPending}>
+                {isPending ? "제출 중..." : "견적 문의 제출"}
                 <Send className="transition-transform group-hover:translate-x-0.5" />
               </Button>
             )}
+            </div>
           </div>
         </div>
       </form>

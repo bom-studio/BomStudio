@@ -4,7 +4,10 @@ import { Check, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PortfolioProject } from "@/types/portfolio";
-import { PORTFOLIO_CATEGORY_BADGE } from "@/types/portfolio";
+import {
+  getPortfolioCategoryLabel,
+  PORTFOLIO_CATEGORY_BADGE,
+} from "@/types/portfolio";
 import { cn } from "@/lib/utils";
 
 interface ProjectInfoProps {
@@ -21,8 +24,14 @@ export function ProjectInfo({ project }: ProjectInfoProps) {
           PORTFOLIO_CATEGORY_BADGE[project.category]
         )}
       >
-        {project.category}
+        {getPortfolioCategoryLabel(project.category)}
       </Badge>
+
+      {project.status ? (
+        <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          {project.status}
+        </p>
+      ) : null}
 
       <h2 className="text-section-title">{project.title}</h2>
 

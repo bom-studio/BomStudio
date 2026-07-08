@@ -24,6 +24,31 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     featured: true,
   },
   {
+    slug: "arsene-long",
+    title: "Arsene Long",
+    tagline: "장기 입원 환자와 보호자를 위한 신뢰감 있는 요양병원 홈페이지",
+    description:
+      "장기 입원 환자와 보호자가 병원 정보를 쉽고 신뢰감 있게 확인할 수 있는 프리미엄 요양병원 홈페이지입니다. 깨끗한 화이트 기반, 넉넉한 여백, 정보 전달 중심의 UI로 의료기관에 맞는 신뢰감을 전달합니다.",
+    siteUrl: "https://arsene-long.vercel.app",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS", "반응형 웹", "SEO 최적화"],
+    category: "Healthcare",
+    duration: "Concept Project",
+    status: "Concept Project",
+    features: [
+      "병원 소개",
+      "의료진 소개",
+      "입원 안내",
+      "진료 안내",
+      "시설 소개",
+      "온라인 상담",
+      "공지사항",
+      "찾아오시는 길",
+    ],
+    previewImage: "/images/portfolio/arsene-long.webp",
+    previewImageAlt: "Arsene Long 요양병원 홈페이지 전체 화면",
+    featured: true,
+  },
+  {
     slug: "mukhyang-print",
     title: "묵향인쇄",
     tagline: "기업 및 인쇄소 소개 홈페이지입니다.",
@@ -84,7 +109,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
 ];
 
 export const PORTFOLIO_STATS = {
-  projectCount: "3+",
-  deployedSites: "3",
+  projectCount: "4+",
+  deployedSites: "4",
   techStack: ["Next.js", "Supabase", "TypeScript", "Tailwind"],
 } as const;

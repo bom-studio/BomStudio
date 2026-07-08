@@ -17,3 +17,8 @@ export const INITIAL_STEP1_DATA: EstimateStep1Data = {
   phone: "",
   email: "",
 };
+
+export interface EstimateStep3Errors {
+  pages?: string;
+  features?: string;
+}

@@ -66,7 +66,7 @@ export function BasicInfoStep({
       <FormField
         id="contact"
         label="담당자"
-        placeholder="허보미"
+        placeholder="홍길동"
         value={data.contact}
         onChange={(e) => handleContactChange(e.target.value)}
         onBlur={() => onBlur("contact")}

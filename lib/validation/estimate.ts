@@ -4,7 +4,6 @@ import type {
   EstimateStep1Field,
 } from "@/types/estimate";
 
-const CONTACT_NAME_REGEX = /^[가-힣a-zA-Z\s]+$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^010-\d{4}-\d{4}$/;
 
@@ -19,11 +18,20 @@ export function validateCompany(value: string): string | undefined {
 export function validateContactName(value: string): string | undefined {
   const trimmed = value.trim();
   if (!trimmed) return "담당자명을 입력해주세요.";
-  if (trimmed.length < 2) return "담당자명은 2자 이상 입력해주세요.";
-  if (trimmed.length > 20) return "담당자명은 20자 이하로 입력해주세요.";
-  if (/^\d+$/.test(trimmed) || !CONTACT_NAME_REGEX.test(trimmed)) {
-    return "담당자명은 한글 또는 영문으로 입력해주세요.";
+
+  if (!/^[가-힣a-zA-Z\s]+$/.test(trimmed)) {
+    return "담당자명은 한글 또는 영문 2글자 이상 입력해주세요.";
   }
+
+  const letterCount = (trimmed.match(/[가-힣a-zA-Z]/g) ?? []).length;
+  if (letterCount < 2) {
+    return "담당자명은 한글 또는 영문 2글자 이상 입력해주세요.";
+  }
+
+  if (trimmed.length > 20) {
+    return "담당자명은 20자 이하로 입력해주세요.";
+  }
+
   return undefined;
 }
 
@@ -79,6 +87,24 @@ export function validateStep1(data: EstimateStep1Data): EstimateStep1Errors {
 }
 
 export function hasStep1Errors(errors: EstimateStep1Errors): boolean {
+  return Object.values(errors).some((error) => error !== undefined);
+}
+
+export function validateStep3(pages: string[], features: string[]) {
+  const errors: { pages?: string; features?: string } = {};
+
+  if (pages.length === 0) {
+    errors.pages = "필요한 페이지를 최소 1개 이상 선택해 주세요.";
+  }
+
+  if (features.length === 0) {
+    errors.features = "필요한 기능을 최소 1개 이상 선택해 주세요.";
+  }
+
+  return errors;
+}
+
+export function hasStep3Errors(errors: { pages?: string; features?: string }): boolean {
   return Object.values(errors).some((error) => error !== undefined);
 }
 
