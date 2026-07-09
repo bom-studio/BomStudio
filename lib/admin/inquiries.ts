@@ -52,7 +52,12 @@ export async function fetchInquiryById(id: string): Promise<EstimateInquiry | nu
     .eq("id", id)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    console.error("fetchInquiryById error:", error.message, { id });
+    return null;
+  }
+
+  if (!data) {
     return null;
   }
 
