@@ -7,7 +7,28 @@ import { logoutAdmin } from "@/app/actions/inquiries";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [{ href: "/admin/inquiries", label: "견적문의" }];
+const NAV_ITEMS = [
+  { href: "/admin/inquiries", label: "견적문의", exact: false },
+  { href: "/admin/estimates", label: "견적서관리", exact: false },
+  { href: "/admin/contracts", label: "계약서관리", exact: false },
+  { href: "/admin/sales", label: "매출관리", exact: false },
+];
+
+function isNavActive(pathname: string, href: string) {
+  if (href === "/admin/inquiries") {
+    return pathname.startsWith("/admin/inquiries");
+  }
+  if (href === "/admin/estimates") {
+    return pathname.startsWith("/admin/estimates");
+  }
+  if (href === "/admin/contracts") {
+    return pathname.startsWith("/admin/contracts");
+  }
+  if (href === "/admin/sales") {
+    return pathname.startsWith("/admin/sales");
+  }
+  return pathname.startsWith(href);
+}
 
 interface AdminHeaderProps {
   email?: string;
@@ -30,7 +51,7 @@ export function AdminHeader({ email }: AdminHeaderProps) {
                 href={item.href}
                 className={cn(
                   "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  pathname.startsWith(item.href)
+                  isNavActive(pathname, item.href)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}

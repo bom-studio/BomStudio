@@ -2,15 +2,13 @@
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveEstimate } from "@/app/actions/estimates";
-import {
-  buildPreviewRows,
-  calculateEstimate,
-  type EstimateDraftData,
-} from "@/lib/admin/estimate-draft";
+import { buildSaveInputFromDraft } from "@/lib/admin/estimate-persistence";
+import type { EstimateDraftData } from "@/lib/admin/estimate-draft";
 import type { EstimateInquiry } from "@/types/inquiry";
+import { cn } from "@/lib/utils";
 import { EstimateDocument } from "./EstimateDocument";
 import {
   EstimatePreviewActions,
@@ -20,35 +18,10 @@ import {
 interface EstimatePreviewStepProps {
   draft: EstimateDraftData;
   inquiry: EstimateInquiry;
+  savedEstimateId: string | null;
+  isEditMode?: boolean;
   onBack: () => void;
-}
-
-/** TODO: 필요 시 서버 액션 분리 */
-async function persistEstimate(draft: EstimateDraftData, inquiry: EstimateInquiry) {
-  const summary = calculateEstimate(draft);
-  const rows = buildPreviewRows(draft);
-
-  return saveEstimate({
-    inquiryId: inquiry.id,
-    estimateNumber: draft.estimateNumber,
-    customerName: draft.customer.name,
-    company: draft.customer.company,
-    phone: draft.customer.phone,
-    email: draft.customer.email,
-    businessType: draft.customer.businessType,
-    items: rows.map((row) => ({
-      title: row.title,
-      description: row.description,
-      duration: row.duration,
-      amount: row.price ?? 0,
-      note: "",
-    })),
-    subtotal: summary.discountedSubtotal,
-    vat: summary.vat,
-    total: summary.total,
-    paymentTerms: draft.paymentTerms,
-    memo: draft.note,
-  });
+  onSaved: (estimateId: string, isUpdate: boolean) => string;
 }
 
 export async function downloadEstimatePdf(
@@ -70,12 +43,30 @@ export async function downloadEstimatePdf(
   pdf.save(`견적서_${estimateNumber}_${safeName}.pdf`);
 }
 
-export function EstimatePreviewStep({ draft, inquiry, onBack }: EstimatePreviewStepProps) {
+export function EstimatePreviewStep({
+  draft,
+  inquiry,
+  savedEstimateId,
+  isEditMode = false,
+  onBack,
+  onSaved,
+}: EstimatePreviewStepProps) {
   const router = useRouter();
   const previewRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const [isPdfPending, setIsPdfPending] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [currentEstimateId, setCurrentEstimateId] = useState<string | null>(savedEstimateId);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    setCurrentEstimateId(savedEstimateId);
+  }, [savedEstimateId]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const handleDownloadPdf = async () => {
     if (!previewRef.current) return;
@@ -94,12 +85,17 @@ export function EstimatePreviewStep({ draft, inquiry, onBack }: EstimatePreviewS
   const handleSave = () => {
     setToast(null);
     startTransition(async () => {
-      const result = await persistEstimate(draft, inquiry);
+      const input = buildSaveInputFromDraft(draft, inquiry, currentEstimateId ?? undefined);
+      const result = await saveEstimate(input);
+
       if (!result.success) {
-        setToast(result.error);
+        setToast({ type: "error", message: result.error });
         return;
       }
-      setToast("견적서가 저장되었습니다.");
+
+      setCurrentEstimateId(result.estimateId);
+      const message = onSaved(result.estimateId, result.isUpdate);
+      setToast({ type: "success", message });
       router.refresh();
     });
   };
@@ -131,14 +127,19 @@ export function EstimatePreviewStep({ draft, inquiry, onBack }: EstimatePreviewS
         onSend={sendEstimateToCustomer}
         isPdfPending={isPdfPending}
         isSavePending={isPending}
+        isSaved={Boolean(currentEstimateId)}
+        isEditMode={isEditMode}
       />
 
       {toast ? (
         <p
-          className="fixed bottom-6 right-6 z-50 rounded-xl bg-[#0F766E] px-4 py-3 text-sm font-medium text-white shadow-lg"
+          className={cn(
+            "fixed bottom-6 right-6 z-50 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg",
+            toast.type === "success" ? "bg-[#0F766E]" : "bg-destructive"
+          )}
           role="status"
         >
-          {toast}
+          {toast.message}
         </p>
       ) : null}
     </div>

@@ -10,6 +10,8 @@ interface EstimatePreviewActionsProps {
   onSend?: () => void;
   isPdfPending?: boolean;
   isSavePending?: boolean;
+  isSaved?: boolean;
+  isEditMode?: boolean;
 }
 
 export function EstimatePreviewActions({
@@ -19,7 +21,17 @@ export function EstimatePreviewActions({
   onSend,
   isPdfPending = false,
   isSavePending = false,
+  isSaved = false,
+  isEditMode = false,
 }: EstimatePreviewActionsProps) {
+  const saveLabel = isSavePending
+    ? "저장 중..."
+    : isEditMode
+      ? "견적서 수정"
+      : isSaved
+        ? "수정 저장"
+        : "견적 저장";
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <Button type="button" variant="outline" onClick={onBack}>
@@ -33,7 +45,7 @@ export function EstimatePreviewActions({
         </Button>
         <Button type="button" onClick={onSave} disabled={isSavePending}>
           <Save className="h-4 w-4" />
-          {isSavePending ? "저장 중..." : "견적 저장"}
+          {saveLabel}
         </Button>
         <Button type="button" variant="outline" onClick={() => onSend?.()}>
           <Send className="h-4 w-4" />

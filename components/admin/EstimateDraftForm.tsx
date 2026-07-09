@@ -148,6 +148,7 @@ export function EstimateDraftForm({ inquiry }: EstimateDraftFormProps) {
         subtotal,
         vat,
         total,
+        vatType: conditions.vatIncluded ? "포함" : conditions.vatSeparate ? "별도" : "면세",
         paymentTerms,
         memo,
       });

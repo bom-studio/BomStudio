@@ -40,6 +40,7 @@ interface EstimateFormProps {
   draft: EstimateDraftData;
   setDraft: React.Dispatch<React.SetStateAction<EstimateDraftData>>;
   onNext: () => void;
+  isEditMode?: boolean;
 }
 
 function formatWon(value: number | null) {
@@ -80,7 +81,7 @@ function OptionChecks({
   );
 }
 
-export function EstimateForm({ inquiry, draft, setDraft, onNext }: EstimateFormProps) {
+export function EstimateForm({ inquiry, draft, setDraft, onNext, isEditMode = false }: EstimateFormProps) {
   const referenceUrls = parseReferenceUrls(inquiry.reference);
   const summary = useMemo(() => calculateEstimate(draft), [draft]);
 
@@ -102,9 +103,11 @@ export function EstimateForm({ inquiry, draft, setDraft, onNext }: EstimateFormP
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold">견적서 작성</h1>
+        <h1 className="text-2xl font-bold">{isEditMode ? "견적서 수정" : "견적서 작성"}</h1>
         <p className="text-sm text-muted-foreground">
-          견적 계산 후 다음 단계에서 견적서를 확인하고 PDF를 저장하세요.
+          {isEditMode
+            ? "저장된 견적서를 수정한 뒤 미리보기에서 견적서 수정을 눌러 저장하세요."
+            : "견적 계산 후 다음 단계에서 견적서를 확인하고 PDF를 저장하세요."}
         </p>
       </header>
 

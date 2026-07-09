@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { draftFromSavedEstimate } from "@/lib/admin/estimate-persistence";
 import {
   createDefaultDraft,
   loadDraftFromStorage,
   saveDraftToStorage,
   type EstimateDraftData,
 } from "@/lib/admin/estimate-draft";
+import type { SavedEstimate } from "@/types/admin-estimate";
 import type { EstimateInquiry } from "@/types/inquiry";
 import { EstimateForm } from "./EstimateForm";
 import { EstimatePreviewStep } from "./EstimatePreviewStep";
@@ -15,18 +17,26 @@ export type EstimateStep = "form" | "preview";
 
 interface EstimateWizardProps {
   inquiry: EstimateInquiry;
+  savedEstimate?: SavedEstimate | null;
+  isEditMode?: boolean;
   initialStep?: EstimateStep;
   initialDraft?: EstimateDraftData | null;
 }
 
 export function EstimateWizard({
   inquiry,
+  savedEstimate = null,
+  isEditMode = false,
   initialStep = "form",
   initialDraft = null,
 }: EstimateWizardProps) {
   const [step, setStep] = useState<EstimateStep>(initialStep);
+  const [savedEstimateId, setSavedEstimateId] = useState<string | null>(
+    savedEstimate?.id ?? inquiry.estimate_id ?? null
+  );
   const [draft, setDraft] = useState<EstimateDraftData>(() => {
     if (initialDraft) return initialDraft;
+    if (savedEstimate) return draftFromSavedEstimate(savedEstimate, inquiry);
     return createDefaultDraft(inquiry);
   });
   const [hydrated, setHydrated] = useState(false);
@@ -36,12 +46,20 @@ export function EstimateWizard({
       setHydrated(true);
       return;
     }
-    const saved = loadDraftFromStorage(inquiry.id);
-    if (saved) {
-      setDraft(saved);
+
+    if (savedEstimate) {
+      setDraft(draftFromSavedEstimate(savedEstimate, inquiry));
+      setSavedEstimateId(savedEstimate.id);
+      setHydrated(true);
+      return;
+    }
+
+    const localDraft = loadDraftFromStorage(inquiry.id);
+    if (localDraft) {
+      setDraft(localDraft);
     }
     setHydrated(true);
-  }, [inquiry.id, initialDraft]);
+  }, [inquiry, initialDraft, savedEstimate]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -61,7 +79,13 @@ export function EstimateWizard({
       <EstimatePreviewStep
         draft={draft}
         inquiry={inquiry}
+        savedEstimateId={savedEstimateId}
+        isEditMode={isEditMode}
         onBack={() => setStep("form")}
+        onSaved={(estimateId, isUpdate) => {
+          setSavedEstimateId(estimateId);
+          return isUpdate ? "견적서가 수정되었습니다." : "견적서가 저장되었습니다.";
+        }}
       />
     );
   }
@@ -73,6 +97,7 @@ export function EstimateWizard({
         draft={draft}
         setDraft={setDraft}
         onNext={() => setStep("preview")}
+        isEditMode={isEditMode}
       />
     </div>
   );
