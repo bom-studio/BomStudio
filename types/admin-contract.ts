@@ -25,6 +25,7 @@ export interface SavedContract {
   id: string;
   inquiry_id: string | null;
   estimate_id: string | null;
+  customer_id: string | null;
   contract_number: string;
   customer_name: string;
   company: string | null;

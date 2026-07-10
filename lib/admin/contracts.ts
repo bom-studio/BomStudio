@@ -19,6 +19,7 @@ function mapRowToSavedContract(row: Record<string, unknown>): SavedContract {
     id: row.id as string,
     inquiry_id: (row.inquiry_id as string | null) ?? null,
     estimate_id: (row.estimate_id as string | null) ?? null,
+    customer_id: (row.customer_id as string | null) ?? null,
     contract_number: row.contract_number as string,
     customer_name: row.customer_name as string,
     company: (row.company as string | null) ?? null,

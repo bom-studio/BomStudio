@@ -10,6 +10,7 @@ import {
   fetchProjectById,
   fetchProjects,
 } from "@/lib/admin/projects";
+import { syncCustomerIdFromInquiry, propagateCustomerId } from "@/lib/admin/customer-link";
 import { clampProgress } from "@/lib/admin/project-form";
 import { buildProjectTitle } from "@/lib/admin/project-title";
 import { createClient } from "@/lib/supabase/server";
@@ -155,9 +156,24 @@ export async function createProject(
   const supabase = await createClient();
   const payload = buildProjectPayload(input);
 
+  let customerId: string | null = null;
+  if (input.inquiryId) {
+    customerId = await syncCustomerIdFromInquiry(supabase, input.inquiryId);
+  } else if (input.contractId) {
+    const { data: contract } = await supabase
+      .from("contracts")
+      .select("customer_id, inquiry_id")
+      .eq("id", input.contractId)
+      .maybeSingle();
+    customerId = (contract?.customer_id as string | null) ?? null;
+    if (!customerId && contract?.inquiry_id) {
+      customerId = await syncCustomerIdFromInquiry(supabase, contract.inquiry_id as string);
+    }
+  }
+
   const { data, error } = await supabase
     .from("projects")
-    .insert(payload)
+    .insert({ ...payload, customer_id: customerId })
     .select("id")
     .single();
 
@@ -167,6 +183,15 @@ export async function createProject(
   }
 
   const projectId = data.id as string;
+
+  if (customerId) {
+    await propagateCustomerId(supabase, customerId, {
+      projectId,
+      contractId: input.contractId,
+      inquiryId: input.inquiryId,
+      estimateId: input.estimateId,
+    });
+  }
 
   if (input.contractId) {
     const { error: paymentLinkError } = await supabase

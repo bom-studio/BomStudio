@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isEstimateStatus, type EstimateStatus } from "@/constants/estimate-admin";
 import { requireAdmin } from "@/lib/admin/auth";
+import { syncCustomerIdFromInquiry } from "@/lib/admin/customer-link";
 import { createClient } from "@/lib/supabase/server";
 import type {
   EstimateActionResult,
@@ -233,12 +234,13 @@ export async function saveEstimate(input: SaveEstimateInput): Promise<EstimateAc
 
   const supabase = await createClient();
   const payload = buildEstimatePayload(input, normalizedItems);
+  const customerId = await syncCustomerIdFromInquiry(supabase, input.inquiryId);
   const existingId = await resolveEstimateId(supabase, input);
 
   if (existingId) {
     const { data, error } = await supabase
       .from("estimates")
-      .update(payload)
+      .update({ ...payload, customer_id: customerId })
       .eq("id", existingId)
       .select("id")
       .single();
@@ -271,6 +273,7 @@ export async function saveEstimate(input: SaveEstimateInput): Promise<EstimateAc
     .insert({
       ...payload,
       inquiry_id: input.inquiryId,
+      customer_id: customerId,
     })
     .select("id")
     .single();

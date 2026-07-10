@@ -10,6 +10,11 @@ import {
 } from "@/constants/contract-admin";
 import { requireAdmin } from "@/lib/admin/auth";
 import { buildProjectTitle } from "@/lib/admin/project-title";
+import {
+  propagateCustomerId,
+  resolveOrCreateCustomer,
+  syncCustomerIdFromInquiry,
+} from "@/lib/admin/customer-link";
 import { fetchContractById, fetchContracts } from "@/lib/admin/contracts";
 import { createClient } from "@/lib/supabase/server";
 import { createPaymentsForContract } from "@/app/actions/payments";
@@ -89,9 +94,22 @@ export async function createContract(
   const supabase = await createClient();
   const payload = buildContractPayload(input);
 
+  let customerId: string | null = null;
+  if (input.inquiryId) {
+    customerId = await syncCustomerIdFromInquiry(supabase, input.inquiryId);
+  } else {
+    customerId = await resolveOrCreateCustomer(supabase, {
+      contact_name: input.customerName,
+      phone: input.phone ?? "",
+      email: input.email,
+      company: input.company,
+      status: "진행중",
+    });
+  }
+
   const { data, error } = await supabase
     .from("contracts")
-    .insert(payload)
+    .insert({ ...payload, customer_id: customerId })
     .select("id")
     .single();
 
@@ -101,6 +119,14 @@ export async function createContract(
   }
 
   const contractId = data.id as string;
+
+  if (customerId) {
+    await propagateCustomerId(supabase, customerId, {
+      contractId,
+      inquiryId: input.inquiryId,
+      estimateId: input.estimateId,
+    });
+  }
 
   if (input.inquiryId) {
     const { error: inquiryError } = await supabase

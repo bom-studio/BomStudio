@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { DEFAULT_INQUIRY_STATUS, INQUIRY_STATUSES, type InquiryStatus } from "@/constants/inquiry";
 import { requireAdmin } from "@/lib/admin/auth";
+import { propagateCustomerId, resolveOrCreateCustomer, syncCustomerIdFromInquiry } from "@/lib/admin/customer-link";
 import { createClient } from "@/lib/supabase/server";
 import type { EstimateInquiryInsert } from "@/types/inquiry";
 import type { EstimateFormData } from "@/types";
@@ -70,14 +71,29 @@ export async function submitEstimateInquiry(
   const supabase = await createClient();
   const payload = mapFormToInsert(data);
 
-  const { error } = await supabase.from("estimate_inquiries").insert({
-    ...payload,
-    status: DEFAULT_INQUIRY_STATUS,
+  const customerId = await resolveOrCreateCustomer(supabase, {
+    contact_name: payload.name,
+    phone: payload.phone,
+    email: payload.email,
+    company: payload.company,
   });
 
+  const { data: inserted, error } = await supabase
+    .from("estimate_inquiries")
+    .insert({
+      ...payload,
+      status: DEFAULT_INQUIRY_STATUS,
+      customer_id: customerId,
+    })
+    .select("id")
+    .single();
+
   if (error) {
-    console.error("submitEstimateInquiry error:", error.message);
     return { success: false, error: "문의 접수 중 오류가 발생했습니다." };
+  }
+
+  if (inserted?.id) {
+    await propagateCustomerId(supabase, customerId, { inquiryId: inserted.id as string });
   }
 
   return { success: true };
@@ -149,6 +165,7 @@ export async function createEstimateFromInquiry(
 
   const estimateId = crypto.randomUUID();
   const supabase = await createClient();
+  await syncCustomerIdFromInquiry(supabase, inquiryId);
 
   const { error } = await supabase
     .from("estimate_inquiries")

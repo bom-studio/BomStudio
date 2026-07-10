@@ -22,6 +22,7 @@ export function buildPaymentRowsFromContract(
     estimate_id: contract.estimate_id,
     contract_id: contract.id,
     project_id: options?.projectId ?? null,
+    customer_id: contract.customer_id ?? null,
     customer_name: contract.customer_name,
     company: contract.company,
     phone: contract.phone,

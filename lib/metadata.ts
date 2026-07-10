@@ -37,6 +37,7 @@ export const metadata: Metadata = {
   creator: siteConfig.name,
 
   verification: {
+    google: "fBxinue1wpSpGf2uqU5tJAXUNaRCEM0EqJ0-yhCvYN8",
     other: {
       "naver-site-verification":
         "0a4f048cbd044e7ad7ab11f1a51962149de1d60b",
@@ -98,12 +99,35 @@ export const jsonLd = {
   alternateName: siteConfig.nameEn,
   description: siteConfig.description,
   url: siteConfig.url,
+
   areaServed: "KR",
+  availableLanguage: ["ko"],
+
+  priceRange: "$$",
+
   serviceType: [
-    "웹사이트 제작",
     "홈페이지 제작",
-    "반응형 웹 개발",
+    "기업 홈페이지 제작",
+    "반응형 홈페이지 제작",
+    "랜딩페이지 제작",
+    "웹사이트 제작",
     "쇼핑몰 제작",
+    "관리자 시스템 개발",
     "예약 시스템 개발",
+    "맞춤형 웹 개발",
+    "웹 애플리케이션 개발",
+    "CRM 개발",
+    "문의 시스템 구축",
+    "Supabase 개발",
+    "Next.js 개발",
+    "UI/UX 디자인",
+    "웹 유지보수",
+    "SEO 최적화",
+    "웹 퍼블리싱",
+  ],
+
+  sameAs: [
+    "https://github.com/bom-studio",
+    "https://bomstudio.kr",
   ],
 };
