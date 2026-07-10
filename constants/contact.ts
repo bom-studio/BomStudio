@@ -1,9 +1,14 @@
 import type { ContactItem } from "@/types";
 
+export const CONTACT = {
+  kakaoChatUrl: "https://pf.kakao.com/_xlQmwX/chat",
+};
+
 export const CONTACT_ITEMS: ContactItem[] = [
   {
     type: "카카오톡",
-    value: "문의 시 안내",
+    value: "1:1 상담",
+    href: CONTACT.kakaoChatUrl,
     icon: "MessageCircle",
   },
   {

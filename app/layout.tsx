@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/layout/SiteShell";
+import { KakaoChatButton } from "@/components/kakao-chat-button";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { getAdminUser } from "@/lib/auth/get-admin-user";
 import { jsonLd, metadata } from "@/lib/metadata";
@@ -25,6 +26,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <SiteShell isAdmin={Boolean(adminUser)}>{children}</SiteShell>
+          <KakaoChatButton />
         </ThemeProvider>
         <Script
           id="json-ld"

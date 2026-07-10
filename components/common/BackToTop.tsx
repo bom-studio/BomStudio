@@ -27,7 +27,7 @@ export function BackToTop() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.2 }}
-          className="fixed bottom-6 right-6 z-50"
+          className="fixed bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))+4.5rem)] right-4 z-50 sm:bottom-[calc(2rem+4.5rem)] sm:right-6"
         >
           <Button
             size="icon"
