@@ -3,6 +3,8 @@ import type { ContractStatus } from "@/constants/contract-admin";
 
 const STATUS_STYLES: Record<ContractStatus, string> = {
   작성중: "bg-amber-100 text-amber-800",
+  발송완료: "bg-sky-100 text-sky-700",
+  서명완료: "bg-emerald-100 text-emerald-700",
   계약완료: "bg-emerald-100 text-emerald-700",
   진행중: "bg-sky-100 text-sky-700",
   종료: "bg-slate-100 text-slate-700",

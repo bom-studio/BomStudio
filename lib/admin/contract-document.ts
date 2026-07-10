@@ -1,10 +1,8 @@
 import { BRAND } from "@/constants/brand";
 import { CONTACT_ITEMS } from "@/constants/contact";
-import {
-  displayContractValue,
-  formatContractPeriod,
-} from "@/lib/admin/contract-display";
+import { displayContractValue, formatContractPeriod } from "@/lib/admin/contract-display";
 import { formatEstimateDate } from "@/lib/admin/estimate-display";
+import { buildProjectTitle } from "@/lib/admin/project-title";
 import type { SavedContract } from "@/types/admin-contract";
 import type { SavedEstimate } from "@/types/admin-estimate";
 import type { EstimateInquiry } from "@/types/inquiry";
@@ -92,7 +90,10 @@ export function buildContractDocumentView({
       email: displayContractValue(contract.email ?? inquiry?.email),
     },
     project: {
-      title: displayContractValue(contract.project_title ?? estimate?.request_summary?.split("\n")[0]),
+      title: displayContractValue(
+        buildProjectTitle(contract.company, contract.contract_type) ||
+          contract.project_title
+      ),
       period: resolveProductionPeriod(contract, estimate),
       contractType: displayContractValue(contract.contract_type),
     },

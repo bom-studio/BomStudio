@@ -47,6 +47,8 @@ export interface SavedContract {
   signature_status: string | null;
   down_payment_paid: boolean;
   balance_payment_paid: boolean;
+  down_payment_paid_at: string | null;
+  balance_payment_paid_at: string | null;
   customer_signed: boolean;
   studio_signed: boolean;
   signed_at: string | null;

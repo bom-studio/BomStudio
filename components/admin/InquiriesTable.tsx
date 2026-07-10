@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { INQUIRY_STATUSES } from "@/constants/inquiry";
+import { updateInquiryStatus } from "@/app/actions/inquiries";
+import { INQUIRY_STATUSES, INQUIRY_STATUS_OPTIONS } from "@/constants/inquiry";
 import type { EstimateInquiry } from "@/types/inquiry";
-import { StatusBadge } from "@/components/admin/StatusBadge";
+import { StatusSelect } from "@/components/admin/StatusSelect";
 import { Input } from "@/components/ui/input";
 import { getInquiryDisplayNumber } from "@/lib/admin/inquiry-number";
 import { formatBudgetCurrency } from "@/lib/format/budget";
@@ -84,7 +85,7 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
   return (
     <>
       <div className="hidden overflow-hidden rounded-2xl border border-border bg-white md:block">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-center text-sm">
           <thead className="border-b border-border bg-section/60 text-muted-foreground">
             <tr>
               <th className="px-5 py-3 font-medium">문의번호</th>
@@ -109,7 +110,13 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
                 <td className="px-5 py-4">{inquiry.business_type || inquiry.company || "-"}</td>
                 <td className="px-5 py-4">{formatBudgetCurrency(inquiry.budget)}</td>
                 <td className="px-5 py-4">
-                  <StatusBadge status={inquiry.status} />
+                  <div className="flex justify-center">
+                    <StatusSelect
+                      value={inquiry.status}
+                      options={INQUIRY_STATUS_OPTIONS}
+                      onChange={(status) => updateInquiryStatus(inquiry.id, status)}
+                    />
+                  </div>
                 </td>
                 <td className="px-5 py-4">
                   <Link
@@ -127,9 +134,8 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
 
       <div className="space-y-3 md:hidden">
         {inquiries.map((inquiry) => (
-          <Link
+          <div
             key={inquiry.id}
-            href={`/admin/inquiries/${inquiry.id}`}
             className="block rounded-2xl border border-border bg-white p-4"
           >
             <div className="flex items-start justify-between gap-3">
@@ -137,13 +143,23 @@ export function InquiriesTable({ inquiries }: Pick<InquiriesTableProps, "inquiri
                 <p className="font-semibold">{inquiry.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{inquiry.phone}</p>
               </div>
-              <StatusBadge status={inquiry.status} />
+              <StatusSelect
+                value={inquiry.status}
+                options={INQUIRY_STATUS_OPTIONS}
+                onChange={(status) => updateInquiryStatus(inquiry.id, status)}
+              />
             </div>
             <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
               <span>{getInquiryDisplayNumber(inquiry)}</span>
               <span>{formatBudgetCurrency(inquiry.budget)}</span>
             </div>
-          </Link>
+            <Link
+              href={`/admin/inquiries/${inquiry.id}`}
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:underline"
+            >
+              상세보기
+            </Link>
+          </div>
         ))}
       </div>
     </>

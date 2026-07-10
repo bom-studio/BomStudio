@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { EstimateDetail } from "@/components/admin/EstimateDetail";
+import { buildEstimateDocumentView } from "@/lib/admin/estimate-document";
 import { fetchEstimateById } from "@/lib/admin/estimates";
 import { fetchInquiryById } from "@/lib/admin/inquiries";
 
@@ -20,6 +21,9 @@ export default async function AdminEstimateDetailPage({ params }: AdminEstimateD
   }
 
   const inquiry = await fetchInquiryById(estimate.inquiry_id);
+  const documentView = buildEstimateDocumentView({ estimate, inquiry });
 
-  return <EstimateDetail estimate={estimate} inquiry={inquiry} />;
+  return (
+    <EstimateDetail estimate={estimate} inquiry={inquiry} documentView={documentView} />
+  );
 }

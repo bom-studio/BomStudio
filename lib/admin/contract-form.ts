@@ -5,8 +5,7 @@ import {
   type BillingCycle,
   type ContractType,
 } from "@/constants/contract-admin";
-import { getFormSnapshot } from "@/lib/admin/estimate-display";
-import { PACKAGE_OPTIONS } from "@/lib/admin/estimate-draft";
+import { buildProjectTitle } from "@/lib/admin/project-title";
 import type { ContractFormState } from "@/types/admin-contract";
 import type { SavedContract } from "@/types/admin-contract";
 import type { SavedEstimate } from "@/types/admin-estimate";
@@ -24,20 +23,11 @@ export function generateContractNumber(): string {
   return `CON-${y}${m}${d}-${random}`;
 }
 
-export function resolveProjectTitle(estimate: SavedEstimate): string {
-  const summary = estimate.request_summary?.trim();
-  if (summary) {
-    const firstLine = summary.split("\n")[0]?.trim();
-    if (firstLine) return firstLine;
-  }
-
-  const snapshot = getFormSnapshot(estimate);
-  const packageType = snapshot?.selections?.packageType;
-  if (packageType && packageType in PACKAGE_OPTIONS) {
-    return PACKAGE_OPTIONS[packageType].label;
-  }
-
-  return "홈페이지 제작";
+export function resolveProjectTitle(
+  company: string | null | undefined,
+  contractType: ContractType | string = "신규제작"
+): string {
+  return buildProjectTitle(company, contractType);
 }
 
 export function splitPayment(amount: number) {
@@ -57,7 +47,7 @@ export function buildContractFormFromEstimate(estimate: SavedEstimate): Contract
     company: estimate.company || "",
     phone: estimate.phone || "",
     email: estimate.email || "",
-    projectTitle: resolveProjectTitle(estimate),
+    projectTitle: resolveProjectTitle(estimate.company, "신규제작"),
     contractAmount: String(amount),
     downPaymentAmount: String(down),
     balancePaymentAmount: String(balance),
@@ -74,19 +64,21 @@ export function buildContractFormFromEstimate(estimate: SavedEstimate): Contract
 }
 
 export function buildContractFormFromSaved(contract: SavedContract): ContractFormState {
+  const contractType = (CONTRACT_TYPES.includes(contract.contract_type as ContractType)
+    ? contract.contract_type
+    : "신규제작") as ContractType;
+
   return {
     contractNumber: contract.contract_number,
     customerName: contract.customer_name,
     company: contract.company || "",
     phone: contract.phone || "",
     email: contract.email || "",
-    projectTitle: contract.project_title || "",
+    projectTitle: buildProjectTitle(contract.company, contractType),
     contractAmount: String(contract.contract_amount),
     downPaymentAmount: String(contract.down_payment_amount),
     balancePaymentAmount: String(contract.balance_payment_amount),
-    contractType: (CONTRACT_TYPES.includes(contract.contract_type as ContractType)
-      ? contract.contract_type
-      : "신규제작") as ContractType,
+    contractType,
     billingCycle: (BILLING_CYCLES.includes(contract.billing_cycle as BillingCycle)
       ? contract.billing_cycle
       : "없음") as BillingCycle,

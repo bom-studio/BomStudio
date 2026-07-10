@@ -9,8 +9,10 @@ import {
   type ContractStatus,
 } from "@/constants/contract-admin";
 import { requireAdmin } from "@/lib/admin/auth";
+import { buildProjectTitle } from "@/lib/admin/project-title";
 import { fetchContractById, fetchContracts } from "@/lib/admin/contracts";
 import { createClient } from "@/lib/supabase/server";
+import { createPaymentsForContract } from "@/app/actions/payments";
 import type {
   ContractMutationResult,
   CreateContractInput,
@@ -35,7 +37,7 @@ function buildContractPayload(input: CreateContractInput) {
     company: input.company?.trim() || null,
     phone: input.phone?.trim() || null,
     email: input.email?.trim() || null,
-    project_title: input.projectTitle?.trim() || null,
+    project_title: buildProjectTitle(input.company, input.contractType) || null,
     contract_amount: Math.max(0, Math.round(input.contractAmount || 0)),
     down_payment_amount: Math.max(0, Math.round(input.downPaymentAmount || 0)),
     balance_payment_amount: Math.max(0, Math.round(input.balancePaymentAmount || 0)),
@@ -168,6 +170,11 @@ export async function updateContractStatus(
     return { success: false, error: "유효하지 않은 상태입니다." };
   }
 
+  const contract = await fetchContractById(id);
+  if (!contract) {
+    return { success: false, error: "계약서를 찾을 수 없습니다." };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.from("contracts").update({ status }).eq("id", id);
 
@@ -176,7 +183,14 @@ export async function updateContractStatus(
     return { success: false, error: "상태 변경 중 오류가 발생했습니다." };
   }
 
-  revalidateContractPaths(id);
+  if (status === "계약완료") {
+    const paymentResult = await createPaymentsForContract(contract);
+    if (!paymentResult.success) {
+      console.error("updateContractStatus payment creation failed:", paymentResult.error);
+    }
+  }
+
+  revalidateContractPaths(id, contract.inquiry_id ?? undefined, contract.estimate_id ?? undefined);
   return { success: true };
 }
 

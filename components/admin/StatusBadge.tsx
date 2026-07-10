@@ -6,6 +6,8 @@ const STATUS_STYLES: Record<InquiryStatus, string> = {
   상담중: "bg-sky-100 text-sky-700",
   견적서작성: "bg-amber-100 text-amber-800",
   계약완료: "bg-emerald-100 text-emerald-700",
+  작업중: "bg-violet-100 text-violet-700",
+  완료: "bg-emerald-100 text-emerald-800",
   보류: "bg-rose-100 text-rose-700",
 };
 

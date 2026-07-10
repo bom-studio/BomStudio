@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ESTIMATE_STATUSES } from "@/constants/estimate-admin";
-import { EstimateStatusBadge } from "@/components/admin/EstimateStatusBadge";
+import { updateEstimateStatus } from "@/app/actions/estimates";
+import { ESTIMATE_STATUSES, ESTIMATE_STATUS_OPTIONS } from "@/constants/estimate-admin";
+import { StatusSelect } from "@/components/admin/StatusSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SavedEstimate } from "@/types/admin-estimate";
@@ -30,10 +31,6 @@ function formatDate(value: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
-}
-
-function formatTotal(value: number) {
-  return `₩${new Intl.NumberFormat("ko-KR").format(value)}`;
 }
 
 export function EstimatesToolbar({
@@ -90,15 +87,13 @@ export function EstimatesTable({ estimates }: Pick<EstimatesTableProps, "estimat
   return (
     <>
       <div className="hidden overflow-hidden rounded-2xl border border-border bg-white md:block">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-center text-sm">
           <thead className="border-b border-border bg-section/60 text-muted-foreground">
             <tr>
               <th className="px-5 py-3 font-medium">견적번호</th>
-              <th className="px-5 py-3 font-medium">작성일</th>
+              <th className="px-5 py-3 font-medium">회사명</th>
               <th className="px-5 py-3 font-medium">고객명</th>
-              <th className="px-5 py-3 font-medium">연락처</th>
-              <th className="px-5 py-3 font-medium">업종</th>
-              <th className="px-5 py-3 font-medium">견적금액</th>
+              <th className="px-5 py-3 font-medium">작성일</th>
               <th className="px-5 py-3 font-medium">상태</th>
               <th className="px-5 py-3 font-medium">상세보기</th>
             </tr>
@@ -109,15 +104,19 @@ export function EstimatesTable({ estimates }: Pick<EstimatesTableProps, "estimat
                 <td className="px-5 py-4 font-mono text-xs text-muted-foreground">
                   {estimate.estimate_number}
                 </td>
+                <td className="px-5 py-4">{estimate.company || "-"}</td>
+                <td className="px-5 py-4 font-medium">{estimate.customer_name}</td>
                 <td className="px-5 py-4 text-muted-foreground">
                   {formatDate(estimate.created_at)}
                 </td>
-                <td className="px-5 py-4 font-medium">{estimate.customer_name}</td>
-                <td className="px-5 py-4">{estimate.phone || "-"}</td>
-                <td className="px-5 py-4">{estimate.business_type || estimate.company || "-"}</td>
-                <td className="px-5 py-4 font-medium">{formatTotal(estimate.total)}</td>
                 <td className="px-5 py-4">
-                  <EstimateStatusBadge status={estimate.status} />
+                  <div className="flex justify-center">
+                    <StatusSelect
+                      value={estimate.status}
+                      options={ESTIMATE_STATUS_OPTIONS}
+                      onChange={(status) => updateEstimateStatus(estimate.id, status)}
+                    />
+                  </div>
                 </td>
                 <td className="px-5 py-4">
                   <Link
@@ -135,23 +134,32 @@ export function EstimatesTable({ estimates }: Pick<EstimatesTableProps, "estimat
 
       <div className="space-y-3 md:hidden">
         {estimates.map((estimate) => (
-          <Link
+          <div
             key={estimate.id}
-            href={`/admin/estimates/${estimate.id}`}
             className="block rounded-2xl border border-border bg-white p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold">{estimate.customer_name}</p>
+                <p className="font-semibold">{estimate.company || estimate.customer_name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{estimate.estimate_number}</p>
               </div>
-              <EstimateStatusBadge status={estimate.status} />
+              <StatusSelect
+                value={estimate.status}
+                options={ESTIMATE_STATUS_OPTIONS}
+                onChange={(status) => updateEstimateStatus(estimate.id, status)}
+              />
             </div>
             <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-              <span>{estimate.phone || "-"}</span>
-              <span>{formatTotal(estimate.total)}</span>
+              <span>{estimate.customer_name}</span>
+              <span>{formatDate(estimate.created_at)}</span>
             </div>
-          </Link>
+            <Link
+              href={`/admin/estimates/${estimate.id}`}
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:underline"
+            >
+              상세보기
+            </Link>
+          </div>
         ))}
       </div>
     </>

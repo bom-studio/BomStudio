@@ -18,13 +18,4 @@ export interface ServiceFeature {
   icon: string;
 }
 
-export interface HomepageSection {
-  id: string;
-  number: number;
-  title: string;
-  description: string;
-  top: number;
-  height: number;
-}
-
 export type ServiceIconMap = Record<string, LucideIcon>;

@@ -1,4 +1,4 @@
-import type { HomepageSection, ServiceFeature, ServiceType } from "@/types/services-page";
+import type { ServiceFeature, ServiceType } from "@/types/services-page";
 
 export const SERVICE_TYPES: ServiceType[] = [
   {
@@ -17,7 +17,7 @@ export const SERVICE_TYPES: ServiceType[] = [
     description: "의료진 소개, 진료안내, 예약 문의를 한곳에서 제공합니다.",
     features: ["의료진", "진료과목", "오시는길", "예약문의"],
     industries: ["병원", "의원", "치과", "한의원"],
-    previewImage: "/images/services/hospital.webp",
+    previewImage: "/images/portfolio/arsene-long.webp",
     previewLabel: "병원 홈페이지",
     icon: "Hospital",
   },
@@ -77,7 +77,7 @@ export const SERVICE_TYPES: ServiceType[] = [
     description: "공지, 문의, 회원, 콘텐츠를 직접 관리할 수 있습니다.",
     features: ["게시판", "회원관리", "문의관리", "콘텐츠"],
     industries: ["기업", "학원", "쇼핑몰", "SaaS"],
-    previewImage: "/images/services/admin.webp",
+    previewImage: "/images/portfolio/admin.webp",
     previewLabel: "관리자 페이지",
     icon: "LayoutDashboard",
   },
@@ -107,68 +107,3 @@ export const SERVICE_FEATURES: ServiceFeature[] = [
   { id: "responsive", label: "반응형", description: "PC, 태블릿, 모바일에 최적화됩니다.", icon: "MonitorSmartphone" },
   { id: "upload", label: "파일 업로드", description: "파일과 이미지를 업로드할 수 있습니다.", icon: "Upload" },
 ];
-
-export const HOMEPAGE_SECTIONS: HomepageSection[] = [
-  {
-    id: "hero",
-    number: 1,
-    title: "메인 배너",
-    description: "브랜드의 첫인상을 전달하는 공간입니다.",
-    top: 0,
-    height: 14,
-  },
-  {
-    id: "about",
-    number: 2,
-    title: "회사소개",
-    description: "회사와 브랜드를 소개하는 영역입니다.",
-    top: 14,
-    height: 14,
-  },
-  {
-    id: "service",
-    number: 3,
-    title: "서비스",
-    description: "제공하는 서비스를 설명합니다.",
-    top: 28,
-    height: 16,
-  },
-  {
-    id: "portfolio",
-    number: 4,
-    title: "포트폴리오",
-    description: "실제 제작 사례를 보여줍니다.",
-    top: 44,
-    height: 16,
-  },
-  {
-    id: "review",
-    number: 5,
-    title: "후기",
-    description: "고객 신뢰를 높이는 공간입니다.",
-    top: 60,
-    height: 12,
-  },
-  {
-    id: "contact",
-    number: 6,
-    title: "문의",
-    description: "상담을 유도하는 가장 중요한 영역입니다.",
-    top: 72,
-    height: 14,
-  },
-  {
-    id: "footer",
-    number: 7,
-    title: "Footer",
-    description: "회사 정보와 연락처를 제공합니다.",
-    top: 86,
-    height: 14,
-  },
-];
-
-export const HOMEPAGE_PREVIEW = {
-  image: "/images/portfolio/mukhyang-long.webp",
-  alt: "기업 홈페이지 전체 구성 예시",
-  url: "mukhyang-print.vercel.app",
-} as const;

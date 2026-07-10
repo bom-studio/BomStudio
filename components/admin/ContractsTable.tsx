@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { CONTRACT_STATUSES } from "@/constants/contract-admin";
-import { ContractStatusBadge } from "@/components/admin/ContractStatusBadge";
+import { updateContractStatus } from "@/app/actions/contracts";
+import { CONTRACT_STATUSES, CONTRACT_STATUS_OPTIONS } from "@/constants/contract-admin";
+import { StatusSelect } from "@/components/admin/StatusSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatEstimateDateTime, formatEstimateMoney } from "@/lib/admin/estimate-display";
+import { formatEstimateMoney } from "@/lib/admin/estimate-display";
 import type { SavedContract } from "@/types/admin-contract";
 import { cn } from "@/lib/utils";
 
@@ -74,39 +75,39 @@ export function ContractsTable({ contracts }: Pick<ContractsTableProps, "contrac
   return (
     <>
       <div className="hidden overflow-hidden rounded-2xl border border-border bg-white md:block">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-center text-sm">
           <thead className="border-b border-border bg-section/60 text-muted-foreground">
             <tr>
               <th className="px-5 py-3 font-medium">계약번호</th>
-              <th className="px-5 py-3 font-medium">작성일</th>
-              <th className="px-5 py-3 font-medium">고객명</th>
-              <th className="px-5 py-3 font-medium">연락처</th>
               <th className="px-5 py-3 font-medium">프로젝트명</th>
               <th className="px-5 py-3 font-medium">계약금액</th>
               <th className="px-5 py-3 font-medium">상태</th>
-              <th className="px-5 py-3 font-medium text-right">상세보기</th>
+              <th className="px-5 py-3 font-medium">상세보기</th>
             </tr>
           </thead>
           <tbody>
             {contracts.map((contract) => (
               <tr key={contract.id} className="border-b border-border/70 last:border-0">
                 <td className="px-5 py-3 font-medium">{contract.contract_number}</td>
-                <td className="px-5 py-3 text-muted-foreground">
-                  {formatEstimateDateTime(contract.created_at)}
-                </td>
-                <td className="px-5 py-3">{contract.customer_name}</td>
-                <td className="px-5 py-3 text-muted-foreground">{contract.phone || "-"}</td>
                 <td className="px-5 py-3">{contract.project_title || "-"}</td>
                 <td className="px-5 py-3 font-semibold">
                   {formatEstimateMoney(contract.contract_amount)}
                 </td>
                 <td className="px-5 py-3">
-                  <ContractStatusBadge status={contract.status} />
+                  <div className="flex justify-center">
+                    <StatusSelect
+                      value={contract.status}
+                      options={CONTRACT_STATUS_OPTIONS}
+                      onChange={(status) => updateContractStatus(contract.id, status)}
+                    />
+                  </div>
                 </td>
-                <td className="px-5 py-3 text-right">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/contracts/${contract.id}`}>상세보기</Link>
-                  </Button>
+                <td className="px-5 py-3">
+                  <div className="flex justify-center">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/admin/contracts/${contract.id}`}>상세보기</Link>
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -116,23 +117,28 @@ export function ContractsTable({ contracts }: Pick<ContractsTableProps, "contrac
 
       <div className="space-y-3 md:hidden">
         {contracts.map((contract) => (
-          <Link
+          <div
             key={contract.id}
-            href={`/admin/contracts/${contract.id}`}
             className="block rounded-xl border border-border bg-white p-4 shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold">{contract.contract_number}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{contract.customer_name}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{contract.project_title || "-"}</p>
               </div>
-              <ContractStatusBadge status={contract.status} />
+              <StatusSelect
+                value={contract.status}
+                options={CONTRACT_STATUS_OPTIONS}
+                onChange={(status) => updateContractStatus(contract.id, status)}
+              />
             </div>
-            <div className="mt-3 space-y-1 text-sm">
-              <p>{contract.project_title || "-"}</p>
-              <p className="font-semibold">{formatEstimateMoney(contract.contract_amount)}</p>
-            </div>
-          </Link>
+            <p className="mt-3 text-sm font-semibold">
+              {formatEstimateMoney(contract.contract_amount)}
+            </p>
+            <Button asChild variant="outline" size="sm" className="mt-3">
+              <Link href={`/admin/contracts/${contract.id}`}>상세보기</Link>
+            </Button>
+          </div>
         ))}
       </div>
     </>

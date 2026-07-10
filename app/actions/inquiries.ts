@@ -202,7 +202,7 @@ export async function loginAdmin(
     return { success: false, error: "관리자 권한이 없는 계정입니다." };
   }
 
-  redirect("/admin/inquiries");
+  redirect("/admin");
 }
 
 export async function logoutAdmin() {

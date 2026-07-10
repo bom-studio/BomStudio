@@ -41,6 +41,8 @@ function mapRowToSavedContract(row: Record<string, unknown>): SavedContract {
     signature_status: (row.signature_status as string | null) ?? null,
     down_payment_paid: downPaymentPaid,
     balance_payment_paid: balancePaymentPaid,
+    down_payment_paid_at: (row.down_payment_paid_at as string | null) ?? null,
+    balance_payment_paid_at: (row.balance_payment_paid_at as string | null) ?? null,
     customer_signed: customerSigned,
     studio_signed: row.studio_signed === true,
     signed_at: (row.signed_at as string | null) ?? null,

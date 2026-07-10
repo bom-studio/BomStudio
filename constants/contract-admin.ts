@@ -1,5 +1,7 @@
 export const CONTRACT_STATUSES = [
   "작성중",
+  "발송완료",
+  "서명완료",
   "계약완료",
   "진행중",
   "종료",
@@ -7,6 +9,14 @@ export const CONTRACT_STATUSES = [
 ] as const;
 
 export type ContractStatus = (typeof CONTRACT_STATUSES)[number];
+
+export const CONTRACT_STATUS_OPTIONS = [
+  "작성중",
+  "발송완료",
+  "서명완료",
+  "계약완료",
+  "취소",
+] as const satisfies readonly ContractStatus[];
 
 export const CONTRACT_TYPES = ["신규제작", "유지보수", "추가개발"] as const;
 

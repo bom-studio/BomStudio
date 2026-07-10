@@ -16,6 +16,7 @@ import {
   type ContractType,
 } from "@/constants/contract-admin";
 import { splitPayment } from "@/lib/admin/contract-form";
+import { buildProjectTitle } from "@/lib/admin/project-title";
 import type { ContractFormState } from "@/types/admin-contract";
 import { cn } from "@/lib/utils";
 
@@ -74,7 +75,18 @@ export function ContractForm({ initialForm, isEditMode = false, contractId }: Co
   const [isPending, startTransition] = useTransition();
 
   const updateField = <K extends keyof ContractFormState>(key: K, value: ContractFormState[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [key]: value };
+
+      if (key === "company" || key === "contractType") {
+        next.projectTitle = buildProjectTitle(
+          key === "company" ? (value as string) : prev.company,
+          key === "contractType" ? (value as ContractType) : prev.contractType
+        );
+      }
+
+      return next;
+    });
   };
 
   const handleContractAmountChange = (value: string) => {
@@ -99,7 +111,7 @@ export function ContractForm({ initialForm, isEditMode = false, contractId }: Co
         company: form.company,
         phone: form.phone,
         email: form.email,
-        projectTitle: form.projectTitle,
+        projectTitle: buildProjectTitle(form.company, form.contractType),
         contractAmount: parseAmount(form.contractAmount),
         downPaymentAmount: parseAmount(form.downPaymentAmount),
         balancePaymentAmount: parseAmount(form.balancePaymentAmount),
@@ -198,8 +210,9 @@ export function ContractForm({ initialForm, isEditMode = false, contractId }: Co
           <Field label="프로젝트명">
             <Input
               value={form.projectTitle}
-              onChange={(e) => updateField("projectTitle", e.target.value)}
-              placeholder="프로젝트명"
+              readOnly
+              className="bg-muted/30"
+              placeholder="회사명+계약유형으로 자동 생성"
             />
           </Field>
           <Field label="계약금액">
