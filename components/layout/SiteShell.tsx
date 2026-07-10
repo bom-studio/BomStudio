@@ -8,7 +8,12 @@ import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 
-export function SiteShell({ children }: { children: ReactNode }) {
+interface SiteShellProps {
+  children: ReactNode;
+  isAdmin?: boolean;
+}
+
+export function SiteShell({ children, isAdmin = false }: SiteShellProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith("/admin");
 
@@ -19,7 +24,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <>
       <ScrollProgress />
-      <Header />
+      <Header isAdmin={isAdmin} />
       <main className="flex-1">{children}</main>
       <Footer />
       <BackToTop />

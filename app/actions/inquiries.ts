@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { DEFAULT_INQUIRY_STATUS, INQUIRY_STATUSES, type InquiryStatus } from "@/constants/inquiry";
 import { requireAdmin } from "@/lib/admin/auth";
-import { getAdminEmail } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import type { EstimateInquiryInsert } from "@/types/inquiry";
 import type { EstimateFormData } from "@/types";
@@ -167,46 +166,4 @@ export async function createEstimateFromInquiry(
   revalidatePath("/admin/inquiries");
   revalidatePath(`/admin/inquiries/${inquiryId}`);
   return { success: true, estimateId };
-}
-
-export async function loginAdmin(
-  email: string,
-  password: string
-): Promise<InquiryActionResult> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.trim(),
-    password,
-  });
-
-  if (error || !data.user?.email) {
-    return { success: false, error: "이메일 또는 비밀번호가 올바르지 않습니다." };
-  }
-
-  const userEmail = data.user.email.toLowerCase();
-  const adminEmail = getAdminEmail();
-
-  if (adminEmail && userEmail !== adminEmail) {
-    await supabase.auth.signOut();
-    return { success: false, error: "관리자 권한이 없는 계정입니다." };
-  }
-
-  const { data: adminRow } = await supabase
-    .from("admin_emails")
-    .select("email")
-    .ilike("email", userEmail)
-    .maybeSingle();
-
-  if (!adminRow && adminEmail && userEmail !== adminEmail) {
-    await supabase.auth.signOut();
-    return { success: false, error: "관리자 권한이 없는 계정입니다." };
-  }
-
-  redirect("/admin");
-}
-
-export async function logoutAdmin() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/admin/login");
 }

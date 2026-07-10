@@ -6,12 +6,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { HeaderAdminNav } from "@/components/layout/HeaderAdminNav";
 import { Logo } from "@/components/logo/Logo";
 import { Button } from "@/components/ui/button";
 import { CTA_ESTIMATE, NAV_ITEMS } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
 
-export function Header() {
+interface HeaderProps {
+  isAdmin?: boolean;
+}
+
+export function Header({ isAdmin = false }: HeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,6 +69,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <HeaderAdminNav isAdmin={isAdmin} />
           <ThemeToggle />
           <Button asChild className="hidden sm:inline-flex">
             <Link href={CTA_ESTIMATE.href}>{CTA_ESTIMATE.label}</Link>
@@ -104,6 +110,12 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+              <HeaderAdminNav
+                isAdmin={isAdmin}
+                variant="mobile"
+                onNavigate={() => setMobileOpen(false)}
+                className="mt-2"
+              />
               <Button asChild className="mt-2 w-full">
                 <Link href={CTA_ESTIMATE.href} onClick={() => setMobileOpen(false)}>
                   {CTA_ESTIMATE.label}

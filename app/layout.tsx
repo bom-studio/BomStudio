@@ -1,5 +1,6 @@
 import { SiteShell } from "@/components/layout/SiteShell";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { getAdminUser } from "@/lib/auth/get-admin-user";
 import { jsonLd, metadata } from "@/lib/metadata";
 import Script from "next/script";
 import "./fonts.css";
@@ -7,11 +8,13 @@ import "./globals.css";
 
 export { metadata };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const adminUser = await getAdminUser();
+
   return (
     <html lang="ko" suppressHydrationWarning className="h-full scroll-smooth">
       <body className="flex min-h-full flex-col font-sans antialiased">
@@ -21,7 +24,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SiteShell>{children}</SiteShell>
+          <SiteShell isAdmin={Boolean(adminUser)}>{children}</SiteShell>
         </ThemeProvider>
         <Script
           id="json-ld"

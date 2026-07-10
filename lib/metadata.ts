@@ -24,14 +24,25 @@ export const siteConfig = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+
   title: {
     default: `${BRAND.name} | ${BRAND.slogan}`,
     template: `%s | ${BRAND.name}`,
   },
+
   description: siteConfig.description,
   keywords: siteConfig.keywords,
+
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+
+  verification: {
+    other: {
+      "naver-site-verification":
+        "0a4f048cbd044e7ad7ab11f1a51962149de1d60b",
+    },
+  },
+
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -39,12 +50,23 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} | ${siteConfig.nameEn}`,
     description: siteConfig.description,
     siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
   },
+
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} | ${siteConfig.nameEn}`,
     description: siteConfig.description,
+    images: [siteConfig.ogImage],
   },
+
   robots: {
     index: true,
     follow: true,
