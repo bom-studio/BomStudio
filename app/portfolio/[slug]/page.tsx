@@ -16,13 +16,25 @@ export async function generateMetadata({ params }: PortfolioDetailPageProps) {
   const project = getPortfolioBySlug(slug);
   if (!project) return {};
 
+  const description = project.seoDescription ?? project.description;
+  const ogImage = project.previewImage
+    ? `${siteConfig.url}${project.previewImage}`
+    : siteConfig.ogImage;
+
   return {
-    ...createPageMetadata(project.title, project.description),
+    ...createPageMetadata(project.title, description),
     openGraph: {
       title: `${project.title} | ${siteConfig.nameEn}`,
-      description: project.description,
+      description,
       url: `${siteConfig.url}/portfolio/${slug}`,
       type: "website",
+      images: [{ url: ogImage, alt: project.previewImageAlt }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | ${siteConfig.nameEn}`,
+      description,
+      images: [ogImage],
     },
   };
 }

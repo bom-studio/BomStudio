@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ExternalLink } from "lucide-react";
+import { GithubIcon } from "@/components/icons/GithubIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PortfolioProject } from "@/types/portfolio";
@@ -72,17 +73,32 @@ export function ProjectInfo({ project }: ProjectInfoProps) {
         </ul>
       </div>
 
-      <Button asChild size="lg" className="group/btn mt-10 w-fit">
-        <a
-          href={project.siteUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${project.title} 사이트 방문`}
-        >
-          사이트 방문
-          <ExternalLink className="transition-transform duration-300 group-hover/btn:translate-x-0.5" />
-        </a>
-      </Button>
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Button asChild size="lg" className="group/btn w-fit">
+          <a
+            href={project.siteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${project.title} 사이트 보기`}
+          >
+            사이트 보기
+            <ExternalLink className="transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+          </a>
+        </Button>
+        {project.githubUrl ? (
+          <Button asChild variant="secondary" size="lg" className="w-fit">
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${project.title} GitHub 저장소`}
+            >
+              GitHub
+              <GithubIcon />
+            </a>
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

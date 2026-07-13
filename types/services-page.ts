@@ -9,6 +9,8 @@ export interface ServiceType {
   previewImage?: string;
   previewLabel: string;
   icon: string;
+  href?: string;
+  external?: boolean;
 }
 
 export interface ServiceFeature {

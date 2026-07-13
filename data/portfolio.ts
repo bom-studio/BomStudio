@@ -2,6 +2,39 @@ import type { PortfolioProject } from "@/types/portfolio";
 
 export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
   {
+    slug: "gimpo-steakhouse",
+    title: "김포스테이크하우스",
+    tagline: "프리미엄 스테이크 다이닝 홈페이지 및 예약 시스템",
+    description:
+      "프리미엄 스테이크 다이닝을 컨셉으로 제작한 포트폴리오입니다. 고급 레스토랑 분위기의 다크 UI와 예약 시스템을 적용하여 실제 운영 가능한 홈페이지 수준으로 제작했습니다.",
+    seoDescription: "프리미엄 스테이크 다이닝 홈페이지 포트폴리오",
+    siteUrl: "https://steak-house-nu.vercel.app/",
+    githubUrl: "https://github.com/bom-studio/SteakHouse",
+    tech: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Shadcn UI",
+      "Framer Motion",
+      "Supabase",
+      "Restaurant",
+      "Reservation",
+      "Responsive",
+    ],
+    category: "Restaurant",
+    duration: "4주",
+    features: [
+      "프리미엄 다크 UI",
+      "온라인 예약 시스템",
+      "메뉴 소개",
+      "반응형 웹",
+      "SEO 최적화",
+    ],
+    previewImage: "/images/portfolio/steakhouse.webp",
+    previewImageAlt: "김포스테이크하우스 홈페이지 전체 화면",
+    featured: true,
+  },
+  {
     slug: "a-one-academy",
     title: "A-One 수학학원",
     tagline: "학생과 학부모를 위한 반응형 학원 홈페이지입니다.",
@@ -109,7 +142,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
 ];
 
 export const PORTFOLIO_STATS = {
-  projectCount: "4+",
-  deployedSites: "4",
+  projectCount: "5+",
+  deployedSites: "5",
   techStack: ["Next.js", "Supabase", "TypeScript", "Tailwind"],
 } as const;
