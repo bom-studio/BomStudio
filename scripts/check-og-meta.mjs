@@ -1,4 +1,4 @@
-const img = await fetch("http://localhost:3000/og-image.jpg");
+const img = await fetch("http://localhost:3000/og-image.png");
 console.log("image", img.status, img.headers.get("content-type"));
 
 const res = await fetch("http://localhost:3000/");

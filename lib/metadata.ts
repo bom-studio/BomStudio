@@ -17,7 +17,7 @@ export const siteConfig = {
   description: metaDescription,
   ogDescription,
   url: siteUrl,
-  ogImage: "/og-image.jpg",
+  ogImage: "/og-image.png",
   keywords: [...SEO_KEYWORDS],
 };
 
@@ -27,7 +27,7 @@ const ogImages: NonNullable<Metadata["openGraph"]>["images"] = [
     width: 1200,
     height: 630,
     alt: `${BRAND.seoServiceName} | ${BRAND.name}`,
-    type: "image/jpeg",
+    type: "image/png",
   },
 ];
 
