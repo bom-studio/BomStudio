@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PortfolioDetailPageProps) {
 
   const description = project.seoDescription ?? project.description;
   const ogImage = project.previewImage
-    ? `${siteConfig.url}${project.previewImage}`
+    ? project.previewImage
     : siteConfig.ogImage;
 
   return {
@@ -27,8 +27,17 @@ export async function generateMetadata({ params }: PortfolioDetailPageProps) {
       title: `${project.title} | ${siteConfig.nameEn}`,
       description,
       url: `${siteConfig.url}/portfolio/${slug}`,
+      siteName: siteConfig.nameEn,
+      locale: "ko_KR",
       type: "website",
-      images: [{ url: ogImage, alt: project.previewImageAlt }],
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: project.previewImageAlt,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

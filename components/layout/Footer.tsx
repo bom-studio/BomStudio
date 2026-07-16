@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo/Logo";
-import { BRAND } from "@/constants/brand";
+import { BRAND, SERVICE_COVERAGE } from "@/constants/brand";
 import { FOOTER_NAV } from "@/constants/navigation";
 
 export function Footer() {
@@ -29,6 +29,11 @@ export function Footer() {
                   bomstudio22@gmail.com
                 </a>
               </p>
+              <div className="space-y-1 pt-4 text-sm text-muted-foreground">
+                {SERVICE_COVERAGE.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
             </div>
           </div>
 

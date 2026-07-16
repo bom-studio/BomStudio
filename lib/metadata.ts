@@ -1,40 +1,50 @@
 import type { Metadata } from "next";
-import { BRAND } from "@/constants/brand";
+import { BRAND, SEO_KEYWORDS } from "@/constants/brand";
 
 const siteUrl = "https://bomstudio.kr";
+
+const seoTitle = `${BRAND.seoServiceName} | ${BRAND.name}`;
+const metaDescription =
+  "김포 홈페이지 제작 전문 봄스튜디오. 기업 홈페이지, 랜딩페이지, 관리자 시스템 제작. 김포·일산 방문상담 가능, 전국 비대면 제작.";
+const ogDescription =
+  "김포 홈페이지 제작 전문. 기업 홈페이지, 랜딩페이지 제작. 김포·일산 방문상담 가능, 전국 비대면 제작.";
 
 export const siteConfig = {
   name: BRAND.nameKo,
   nameEn: BRAND.name,
+  seoServiceName: BRAND.seoServiceName,
   slogan: BRAND.slogan,
-  description:
-    "작은 브랜드와 1인 사업자를 위한 홈페이지, 랜딩페이지, 웹서비스를 기획하고 제작합니다.",
+  description: metaDescription,
+  ogDescription,
   url: siteUrl,
-  ogImage: `${siteUrl}/og-image.png`,
-  keywords: [
-    "웹사이트 제작",
-    "홈페이지 제작",
-    "반응형 웹",
-    "봄스튜디오",
-    "Bom Studio",
-    "웹 에이전시",
-    "Next.js",
-  ],
+  ogImage: "/og-image.jpg",
+  keywords: [...SEO_KEYWORDS],
 };
+
+const ogImages: NonNullable<Metadata["openGraph"]>["images"] = [
+  {
+    url: siteConfig.ogImage,
+    width: 1200,
+    height: 630,
+    alt: `${BRAND.seoServiceName} | ${BRAND.name}`,
+    type: "image/jpeg",
+  },
+];
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
 
   title: {
-    default: `${BRAND.name} | ${BRAND.slogan}`,
+    default: seoTitle,
     template: `%s | ${BRAND.name}`,
   },
 
   description: siteConfig.description,
   keywords: siteConfig.keywords,
 
-  authors: [{ name: siteConfig.name }],
-  creator: siteConfig.name,
+  authors: [{ name: siteConfig.nameEn }],
+  creator: siteConfig.nameEn,
+  publisher: siteConfig.nameEn,
 
   verification: {
     google: "fBxinue1wpSpGf2uqU5tJAXUNaRCEM0EqJ0-yhCvYN8",
@@ -48,29 +58,26 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: siteConfig.url,
-    title: `${siteConfig.name} | ${siteConfig.nameEn}`,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
+    title: seoTitle,
+    description: siteConfig.ogDescription,
+    siteName: siteConfig.nameEn,
+    images: ogImages,
   },
 
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | ${siteConfig.nameEn}`,
-    description: siteConfig.description,
+    title: seoTitle,
+    description: siteConfig.ogDescription,
     images: [siteConfig.ogImage],
   },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -78,56 +85,99 @@ export function createPageMetadata(
   title: string,
   description: string
 ): Metadata {
+  const pageTitle = `${title} | ${BRAND.name}`;
+
   return {
     title,
     description,
     openGraph: {
-      title: `${title} | ${siteConfig.name}`,
+      title: pageTitle,
       description,
+      url: siteConfig.url,
+      siteName: siteConfig.nameEn,
+      locale: "ko_KR",
+      type: "website",
+      images: ogImages,
     },
     twitter: {
-      title: `${title} | ${siteConfig.name}`,
+      card: "summary_large_image",
+      title: pageTitle,
       description,
+      images: [siteConfig.ogImage],
     },
   };
 }
 
+const areaServed = [
+  { "@type": "City", name: "김포시" },
+  { "@type": "City", name: "고양시" },
+  { "@type": "City", name: "인천광역시" },
+  { "@type": "Country", name: "대한민국" },
+];
+
 export const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: siteConfig.name,
-  alternateName: siteConfig.nameEn,
-  description: siteConfig.description,
-  url: siteConfig.url,
-
-  areaServed: "KR",
-  availableLanguage: ["ko"],
-
-  priceRange: "$$",
-
-  serviceType: [
-    "홈페이지 제작",
-    "기업 홈페이지 제작",
-    "반응형 홈페이지 제작",
-    "랜딩페이지 제작",
-    "웹사이트 제작",
-    "쇼핑몰 제작",
-    "관리자 시스템 개발",
-    "예약 시스템 개발",
-    "맞춤형 웹 개발",
-    "웹 애플리케이션 개발",
-    "CRM 개발",
-    "문의 시스템 구축",
-    "Supabase 개발",
-    "Next.js 개발",
-    "UI/UX 디자인",
-    "웹 유지보수",
-    "SEO 최적화",
-    "웹 퍼블리싱",
-  ],
-
-  sameAs: [
-    "https://github.com/bom-studio",
-    "https://bomstudio.kr",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteConfig.url}/#website`,
+      name: BRAND.name,
+      alternateName: [BRAND.nameKo, BRAND.seoServiceName],
+      url: siteConfig.url,
+      description: siteConfig.description,
+      publisher: { "@id": `${siteConfig.url}/#organization` },
+      inLanguage: "ko-KR",
+    },
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": `${siteConfig.url}/#organization`,
+      name: BRAND.name,
+      alternateName: [BRAND.nameKo, BRAND.seoServiceName],
+      description: siteConfig.description,
+      url: siteConfig.url,
+      image: `${siteConfig.url}${siteConfig.ogImage}`,
+      telephone: "010-6780-5934",
+      email: "bomstudio22@gmail.com",
+      priceRange: "$$",
+      areaServed,
+      availableLanguage: ["ko"],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "김포시",
+        addressRegion: "경기도",
+        addressCountry: "KR",
+      },
+      sameAs: ["https://github.com/bom-studio", "https://bomstudio.kr"],
+    },
+    {
+      "@type": "Service",
+      "@id": `${siteConfig.url}/#service`,
+      name: "홈페이지 제작",
+      serviceType: [
+        "홈페이지 제작",
+        "랜딩페이지 제작",
+        "기업 홈페이지 제작",
+        "웹개발",
+      ],
+      description: siteConfig.ogDescription,
+      provider: { "@id": `${siteConfig.url}/#organization` },
+      areaServed,
+      url: siteConfig.url,
+      offers: {
+        "@type": "Offer",
+        availability: "https://schema.org/InStock",
+        priceCurrency: "KRW",
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "홈페이지 제작 서비스",
+        itemListElement: [
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "홈페이지 제작" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "랜딩페이지 제작" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "기업 홈페이지 제작" } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "웹개발" } },
+        ],
+      },
+    },
   ],
 };

@@ -1,15 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/constants/brand";
 import { HeroFeatureCards } from "@/components/sections/HeroFeatureCards";
 import { HeroShowcase } from "@/components/sections/HeroShowcase";
 import { textLine, textStagger, transition } from "@/lib/motion";
-
-const titleLines = ["브랜드의 시작,", "웹에서 완성합니다."];
 
 const TRUST_BADGES = [
   "반응형 제작",
@@ -45,11 +43,11 @@ export function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...transition.normal, delay: 0.05 }}
-              className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-white px-4 py-1.5"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-white px-4 py-1.5"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
-              <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                {BRAND.name}
+              <MapPin className="h-3.5 w-3.5 text-primary" aria-hidden="true" strokeWidth={1.75} />
+              <span className="text-xs font-medium tracking-wide text-muted-foreground">
+                {BRAND.heroBadge}
               </span>
             </motion.div>
 
@@ -59,23 +57,21 @@ export function Hero() {
               animate="visible"
               className="text-hero mt-7"
             >
-              {titleLines.map((line) => (
-                <motion.span key={line} variants={textLine} className="block">
-                  {line}
-                </motion.span>
-              ))}
+              <motion.span variants={textLine} className="block">
+                {BRAND.heroTitle}
+              </motion.span>
             </motion.h1>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...transition.normal, delay: 0.25 }}
-              className="mt-6 max-w-md text-body-lg text-muted-foreground"
+              className="mt-6 max-w-lg space-y-1 text-body-lg text-muted-foreground"
             >
-              브랜드를 소개하는 홈페이지부터 예약 시스템, 관리자 페이지, 맞춤형 웹서비스까지.
-              <br />
-              기획부터 디자인, 개발, 배포까지 한 번에 제공합니다.
-            </motion.p>
+              {BRAND.heroDescription.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -85,12 +81,12 @@ export function Hero() {
             >
               <Button asChild size="lg" className="group">
                 <Link href="/portfolio">
-                  실제 제작 사례 보기
+                  포트폴리오 보기
                   <ArrowRight className="transition-transform duration-300 group-hover:translate-x-0.5" />
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
-                <Link href="/contact">무료 상담하기</Link>
+                <Link href="/contact">무료 상담 신청</Link>
               </Button>
             </motion.div>
 
