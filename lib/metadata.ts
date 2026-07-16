@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   publisher: siteConfig.nameEn,
 
   verification: {
-    google: "fBxinue1wpSpGf2uqU5tJAXUNaRCEM0EqJ0-yhCvYN8",
+    google: "0FNk6GsEuO41wRm-t7AgKMX-mhGBztTWF7xOdbbqL_U",
     other: {
       "naver-site-verification":
         "0a4f048cbd044e7ad7ab11f1a51962149de1d60b",
@@ -78,6 +78,15 @@ export const metadata: Metadata = {
       index: true,
       follow: true,
     },
+  },
+
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
   },
 };
 
