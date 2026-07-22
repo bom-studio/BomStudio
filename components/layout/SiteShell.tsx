@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { BackToTop } from "@/components/common/BackToTop";
-import { OpenEventPopup } from "@/components/common/OpenEventPopup";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -28,7 +27,6 @@ export function SiteShell({ children, isAdmin = false }: SiteShellProps) {
       <main className="flex-1">{children}</main>
       <Footer />
       <BackToTop />
-      <OpenEventPopup />
     </>
   );
 }
